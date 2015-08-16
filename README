@@ -1,0 +1,38 @@
+# Compilation of the workflow is quite involved, so an explanation is provided here.
+
+# The first step is to convert the figure tags into figure numbers. This is because
+# markdown doesn't have particularly good support for figure labelling - at least,
+# not in a flexible manner that works for both LaTeX and HTML. Instead, we hard-code
+# the figure numbers into the markdown text, so that it makes sense in all downstream
+# applications. FIgure numbers are also hardcoded into the captions, which means that
+# you need to specify empty captions within LaTeX.
+
+cd markdown
+./refigure.sh
+cd -
+
+# The second step is to compile the R markdown file. This is done with some care, 
+# given that the workflow is quite long. The script below will save the output upon 
+# errors in compilation, and generate a new *.Rmd file that picks up from the chunk
+# containing the error. This means that you can fix the bug and keep going, rather 
+# than restarting the entire workflow from the beginning (which is useful for testing). 
+# This generates a markdown file along with pictures and stuff.
+
+cd markdown
+Rscript compile.R workflow
+cd -
+
+# The next step is to convert the markdown into a format of choice. Here, we convert
+# it to HTML using render(), but it's also possible to convert to TeX via pandoc 
+# (you need the TeX template from rmarkdown to define the environments, though).
+
+cd converted
+cp ../markdown/workflow.md .
+ln -sf ../markdown/figure
+R -e "rmarkdown::render('workflow.md')"
+
+pandoc -t latex workflow.md --bibliography ref.bib \
+    --template ~/Software/R/current/library/rmarkdown/rmd/latex/default.tex \
+    --highlight-style tango > workflow.tex
+cd -
+
