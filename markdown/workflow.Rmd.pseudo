@@ -46,7 +46,7 @@ Statistical modelling is based on the negative binomial (NB) distribution with g
 Code is also provided for filtering, normalization and region-level control of the false discovery rate (FDR).
 Finally, annotation and visualization of the DB regions is described.
 
-The application of the methods in this article will be demonstrated on two different ChIP-seq data sets.
+The application of the methods in this article will be demonstrated on two publicly available ChIP-seq data sets.
 The first data set studies changes in H3K9ac marking between pro-B and mature B cells [@domingo2012bcell].
 The second data set studies changes in CREB-binding protein (CBP) binding between wild-type and CBP knock-out cells [@kasper2014genomewide].
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
@@ -825,6 +825,13 @@ for (bam in bam.files) {
 indexBam(bam.files)
 ```
 
+```{r, echo = FALSE, results = 'hide'}
+# Cleaning up
+unlink(all.fastq)
+unlink(temp.dir, recursive=TRUE)
+unlink(temp.file)
+```
+
 Some mapping statistics can be reported as previously described.
 For brevity, the code will not be shown here, as it is identical to that used for the H3K9ac analysis.
 
@@ -976,7 +983,7 @@ save(file="cbp_objects.Rda", win.data, bins, y)
 
 ## Annotation and visualization
 
-Annotation is added using the `detailRanges` function.
+Annotation is added using the `detailRanges` function, as previously described.
 
 ```{r}
 anno <- detailRanges(out.ranges, orgdb=org.Mm.eg.db,
@@ -1023,6 +1030,8 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
+Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
+
 # Summary  
 
 This workflow describes the steps of a window-based DB analysis, from read alignment through to visualization of DB regions.
@@ -1036,5 +1045,24 @@ Readers are encouraged to apply the concepts and code presented in this article 
 ```{r}
 sessionInfo()
 ```
+
+# Author contributions
+
+A.T.T.L. developed and tested the workflow on the H3K9ac and CBP data sets.
+G.K.S. provided direction on the design of the workflow.
+Both A.T.T.L. and G.K.S. wrote the article.
+
+# Competing interests
+
+No competing interests were disclosed.
+
+# Grant information
+
+National Health and Medical Research Council (Program Grant 1054618 and Fellowship to G.K.S.);
+Victorian State Government Operational Infrastructure Support; Australian Government NHMRC IRIIS.
+
+# Acknowledgements
+
+The authors would like to thank Prof. Stephen Nutt for his valuable insights on B-cell biology.
 
 # References
