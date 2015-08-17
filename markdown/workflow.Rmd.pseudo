@@ -1012,7 +1012,7 @@ This allows visualization of the strand bimodality that is characteristic of gen
 In Figure ((tfplot)), two adjacent sites are present at the *Gbe1* promoter, both of which exhibit increased binding in the WT genotype.
 Coverage is also substantially different between the WT replicates, consistent with the presence of a batch effect.
 
-```{r tfplot, fig.height=6, fig.width=8, fig.cap="Coverage tracks for TF binding sites that are differentially bound in the WT against the KO. Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale."}
+```{r tfplot, fig.height=6, fig.width=8, fig.cap="Coverage tracks for TF binding sites that are differentially bound in the WT against the KO. Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility)."}
 collected <- list()
 lib.sizes <- filtered.data$totals/1e6
 for (i in 1:length(bam.files)) { 
