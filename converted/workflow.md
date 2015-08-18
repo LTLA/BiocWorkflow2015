@@ -1078,13 +1078,6 @@ temp.bam <- "cbp_temp.bam"
 temp.file <- "cbp_metric.txt"
 temp.dir <- "cbp_working"
 dir.create(temp.dir)
-```
-
-```
-## Warning in dir.create(temp.dir): 'cbp_working' already exists
-```
-
-```r
 for (bam in bam.files) {
     out <- suppressWarnings(sortBam(bam, "cbp_temp"))
     file.rename(out, bam)
@@ -1097,6 +1090,8 @@ for (bam in bam.files) {
 }
 indexBam(bam.files)
 ```
+
+
 
 Some mapping statistics can be reported as previously described.
 For brevity, the code will not be shown here, as it is identical to that used for the H3K9ac analysis.
@@ -1393,7 +1388,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 12:** Coverage tracks for TF binding sites that are differentially bound in the WT against the KO. Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale.](figure/tfplot-1.png) 
+![**Figure 12:** Coverage tracks for TF binding sites that are differentially bound in the WT against the KO. Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
 
