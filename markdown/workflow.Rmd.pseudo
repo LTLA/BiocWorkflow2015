@@ -54,8 +54,8 @@ The aim is to provide readers with a variety of usage examples from which they c
 
 # Aligning reads in the H3K9ac libraries
 
-The first task is to download the relevant ChIP-seq libraries from the NCBI Gene Expression Omnibus [@edgar2002geo].
-These are obtained using the Sequence Read Accession (SRA) numbers listed below.
+The first task is to download the relevant ChIP-seq libraries from the NCBI Gene Expression Omnibus (GEO) [@edgar2002geo].
+These are obtained from the data series GSE38046, using the Sequence Read Accession (SRA) numbers listed below.
 The experiment contains two biological replicates in total for each of the two cell types, i.e., pro-B and mature B.
 Multiple technical replicates exist for some of the biological replicates, and are indicated as those files with the same `grouping`.
 
@@ -63,16 +63,15 @@ Multiple technical replicates exist for some of the biological replicates, and a
 sra.numbers <- c("SRR499718", "SRR499719", "SRR499720", "SRR499721", 
     "SRR499734", "SRR499735", "SRR499736", "SRR499737", "SRR499738")
 grouping <- c("proB-8113", "proB-8113", "proB-8108", "proB-8108", 
-    "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8059", 
-    "matureB-8086")
-data.frame(SRA=sra.numbers, Condition=grouping)
+    "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8086")
+all.sra <- paste0(sra.numbers, ".lite.sra")
+data.frame(SRA=all.sra, Condition=grouping)
 ```
 
 These files are downloaded in the SRA format, and need to be unpacked to the FASTQ format prior to alignment.
 This can be done using the `fastq-dump` utility from the [SRA Toolkit](http://www.ncbi.nlm.nih.gov/Traces/sra/?view=software).
 
 ```{r}
-all.sra <- paste0(sra.numbers, ".lite.sra")
 for (sra in all.sra) {
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -327,7 +326,7 @@ o <- order(win.ab)
 lines(win.ab[o], fit$fitted[o], col="red")
 ```
 
-Trended biases are refractory to scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
+Trended biases cannot be removed by scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
 Rather, non-linear normalization methods must be used.
 `r Biocpkg("csaw")` implements a version of the fast loess method [@ballman2004fast] that is adapted to count data.
 This produces a matrix of offsets that can be used during GLM fitting.
@@ -395,7 +394,7 @@ summary(y$trended.dispersion)
 
 The NB dispersion trend is visualized in Figure ((bcvplot)) as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
 A trend that decreases to a plateau with increasing abundance is typical of many analyses, including those of RNA-seq and ChIP-seq data.
-Note that only the trended dispersion will be used here -- the common and tagwise values are only shown for completeness.
+Note that only the trended dispersion will be used here -- the common and tagwise values are only shown for diagnostic purposes.
 
 ```{r bcvplot, fig.cap="Abundance-dependent trend in the BCV for each window, represented by the blue line. Common and tagwise estimates are also shown."}
 plotBCV(y)
@@ -729,8 +728,10 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 ### Simple DB across a small region
 
-Both of the above regions are quite large, spanning several kilobases.
-However, `r Biocpkg("csaw")` is equally capable of detecting sharp DB events.
+Both of the examples above involve differential marking within broad regions spanning several kilobases.
+This is consistent with changes in the marking profile across a large number of nucleosomes.
+However, H3K9ac marking can also be concentrated into small regions, involving only a few nucleosomes.
+`r Biocpkg("csaw")` is equally capable of detecting "sharp" DB within these small regions.
 This can be demonstrated by examining those clusters that contain a smaller number of windows.
 
 ```{r}
@@ -762,6 +763,15 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
+Note that the window size will determine whether sharp or broad events are preferentially detected.
+Larger windows provide more power to detect broad events (as the counts are higher), while smaller windows provide more resolution to detect sharp events.
+Optimal detection of all features can be obtained by performing analyses with multiple window sizes and consolidating the results, 
+    though -- for brevity -- this will not be described here.
+In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
+For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
+
+At this point, it is worth o
+
 # Repeating the analysis for the CBP data
 
 ## Overview
@@ -773,20 +783,20 @@ Most, if not all, of these sites should be increased in the WT, given that prote
 
 ## Aligning reads from CBP libraries
 
-Libraries are downloaded from the NCBI using the SRA accessions below.
+Libraries are downloaded from the NCBI GEO data series GSE54453, using the SRA accessions listed below.
 The data set contains two biological replicates for each of the two genotypes.
 One file is available for each library, i.e., no technical replicates.
 
 ```{r}
 sra.numbers <- c("SRR1145787", "SRR1145788", "SRR1145789", "SRR1145790")
 genotype <- c("wt", "wt", "ko", "ko")
-data.frame(SRA=sra.numbers, Condition=genotype)
+all.sra <- paste0(sra.numbers, ".sra")
+data.frame(SRA=all.sra, Condition=genotype)
 ```
 
 SRA files are unpacked to yield FASTQ files with the raw read sequences.
 
 ```{r}
-all.sra <- paste0(sra.numbers, ".sra")
 for (sra in all.sra) { 
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -994,6 +1004,7 @@ elementMetadata(out.ranges) <- data.frame(meta, anno)
 
 The top-ranked DB event will be visualized here.
 This corresponds to a simple DB event, as all windows are changing in the same direction, i.e., up in the WT.
+The binding region is also quite small relative to some of the H3K9ac examples, consistent with sharp TF binding to a specific recognition site.
 
 ```{r}
 o <- order(out.ranges$PValue)    
@@ -1040,11 +1051,20 @@ In particular, the core of the workflow -- the detection of DB regions -- is bas
 Analyses are shown for histone mark and TF data sets, with differences in parametrization that are appropriate to each data type.
 Readers are encouraged to apply the concepts and code presented in this article to their own data.
 
-# Session information
+# Software availability
+
+This workflow depends on various packages from version 3.1 of the Bioconductor project, running on version 3.2.0 (or higher) of *R*.
+It requires a number of software packages, including `r Biocpkg("csaw")`, `r Biocpkg("edgeR")`, `r Biocpkg("Rsubread")`, `r Biocpkg("Rsamtools")`, `r Biocpkg("Gviz")`, `r Biocpkg("Rtracklayer")` and `r Biocpkg("ChIPpeakAnno")`.
+It also depends on the annotation packages `r Biocannopkg("org.Mm.eg.db")` and `r Biocannopkg("TxDb.Mmusculus.UCSC.mm10.knownGene")`.
+Version numbers for all packages used are shown below.
 
 ```{r}
 sessionInfo()
 ```
+
+For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
+Readers should note that read alignment in each data set can only be performed on Unix or Mac OS, as `r Biocpkg("Rsubread")` is not supported for Windows.
+However, downstream analyses of the BAM files can be performed on any system.
 
 # Author contributions
 
