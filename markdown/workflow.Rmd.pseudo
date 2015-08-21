@@ -1053,7 +1053,7 @@ Readers are encouraged to apply the concepts and code presented in this article 
 
 # Software availability
 
-This workflow depends on various packages from version 3.1 of the Bioconductor project, running on version 3.2.0 (or higher) of *R*.
+This workflow depends on various packages from version 3.1 of the Bioconductor project, running on *R* version 3.2.0 or higher.
 It requires a number of software packages, including `r Biocpkg("csaw")`, `r Biocpkg("edgeR")`, `r Biocpkg("Rsubread")`, `r Biocpkg("Rsamtools")`, `r Biocpkg("Gviz")`, `r Biocpkg("Rtracklayer")` and `r Biocpkg("ChIPpeakAnno")`.
 It also depends on the annotation packages `r Biocannopkg("org.Mm.eg.db")` and `r Biocannopkg("TxDb.Mmusculus.UCSC.mm10.knownGene")`.
 Version numbers for all packages used are shown below.
@@ -1063,8 +1063,10 @@ sessionInfo()
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
-Readers should note that read alignment in each data set can only be performed on Unix or Mac OS, as `r Biocpkg("Rsubread")` is not supported for Windows.
-However, downstream analyses of the BAM files can be performed on any system.
+Readers should note that the read alignment steps for each data set can only be performed on Unix or Mac OS.
+This is because the various `system` calls assume that a Unix-style command-line interface is present.
+In addition, `r Biocpkg("Rsubread")` is not supported for Windows.
+However, downstream analyses of the BAM files can be performed using any platform on which *R* can be installed.
 
 # Author contributions
 
