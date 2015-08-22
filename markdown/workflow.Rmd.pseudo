@@ -141,7 +141,7 @@ for (bam in bam.files) {
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
 
-```{r, eval=!align, results="hide", echo=FALSE}
+```{r, eval=!align, results="hide", echo=FALSE, message=FALSE}
 library(Rsamtools)
 library(Rsubread)
 by.group <- split(all.sra, grouping)
