@@ -142,6 +142,8 @@ The behaviour of the alignment pipeline for this data set can be easily summariz
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
 
 ```{r, eval=!align, results="hide", echo=FALSE}
+library(Rsamtools)
+library(Rsubread)
 by.group <- split(all.sra, grouping)
 bam.files <- paste0(names(by.group), ".bam")
 ```
