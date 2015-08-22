@@ -16,6 +16,7 @@ bibliography: ref.bib
 library(BiocStyle)
 library(knitr)
 opts_chunk$set(error=FALSE)
+align <- TRUE
 ```
 
 # Introduction
@@ -75,7 +76,7 @@ data.frame(SRA=all.sra, Condition=grouping)
 These files are downloaded in the SRA format, and need to be unpacked to the FASTQ format prior to alignment.
 This can be done using the `fastq-dump` utility from the [SRA Toolkit](http://www.ncbi.nlm.nih.gov/Traces/sra/?view=software).
 
-```{r}
+```{r, eval=align}
 for (sra in all.sra) {
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -86,7 +87,7 @@ all.fastq <- paste0(sra.numbers, ".fastq")
 Technical replicates are merged together prior to further processing. 
 This reflects the fact that they originate from a single library of DNA fragments.
 
-```{r}
+```{r, eval=align}
 by.group <- split(all.fastq, grouping)
 for (group in names(by.group)) {
     code <- system(paste(c("cat", by.group[[group]], ">",
@@ -100,7 +101,7 @@ Reads in each library are aligned to the mm10 build of the mouse genome, using t
 This assumes that an index has already been constructed with the prefix `index/mm10`.
 Here, a consensus threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32 bp).
 
-```{r, results="hide", message=FALSE}
+```{r, results="hide", eval=align, message=FALSE}
 library(Rsubread)
 bam.files <- paste0(names(by.group), ".bam")
 align(index="index/mm10", readfile1=group.fastq, TH1=2, 
@@ -111,7 +112,7 @@ In each of the resulting BAM files, alignments are re-sorted by their mapping lo
 This is required for input into `r Biocpkg("csaw")`, 
     but is also useful for other programs like genome browsers that depend on sorting and indexing for rapid retrieval of reads.
 
-```{r, message=FALSE, results="hide"}
+```{r, message=FALSE, results="hide", eval=align}
 library(Rsamtools)
 for (bam in bam.files) {
     out <- suppressWarnings(sortBam(bam, "h3k9ac_temp"))
@@ -122,7 +123,7 @@ for (bam in bam.files) {
 Potential PCR duplicates are marked using the `MarkDuplicates` tool from the [Picard software suite](http://broadinstitute.github.io/picard).
 These are identified as alignments at the same genomic location, such that they may have originated from PCR-amplified copies of the same DNA fragment.
 
-```{r}
+```{r, eval=align}
 temp.bam <- "h3k9ac_temp.bam"
 temp.file <- "h3k9ac_metric.txt"
 temp.dir <- "h3k9ac_working"
@@ -139,6 +140,11 @@ for (bam in bam.files) {
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+
+```{r, eval=!align, results="hide", echo=FALSE}
+by.group <- split(all.sra, grouping)
+bam.files <- paste0(names(by.group), ".bam")
+```
 
 ```{r mapstat}
 diagnostics <- list()
@@ -159,11 +165,11 @@ diag.stats
 Finally, the libraries are indexed for rapid retrieval by genomic location.
 This generates a number of index files at the same location as the BAM files.
 
-```{r, results = 'hide'}
+```{r, eval=align, results = 'hide'}
 indexBam(bam.files)
 ```
 
-```{r, echo = FALSE, results = 'hide'}
+```{r, echo = FALSE, results = 'hide', eval=align}
 # Cleaning up
 unlink(all.fastq)
 unlink(group.fastq)
@@ -798,7 +804,7 @@ data.frame(SRA=all.sra, Condition=genotype)
 
 SRA files are unpacked to yield FASTQ files with the raw read sequences.
 
-```{r}
+```{r, eval=align}
 for (sra in all.sra) { 
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -810,7 +816,7 @@ Reads are aligned to the mm10 genome using `r Biocpkg("Rsubread")`.
 Here, the default consensus threshold is used as the reads are longer (75 bp).
 A Phred offset of +64 is also used, instead of the default +33 used in the previous analysis.
 
-```{r, message=FALSE, results="hide"}
+```{r, eval=align, message=FALSE, results="hide"}
 bam.files <- paste0(sra.numbers, ".bam")
 align(index="index/mm10", readfile1=all.fastq, phredOffset=64, 
     input_format="FASTQ", output_file=bam.files)
@@ -819,7 +825,7 @@ align(index="index/mm10", readfile1=all.fastq, phredOffset=64,
 Alignments in each BAM file are sorted by coordinate.
 Duplicate reads are marked, and the resulting files are indexed.
 
-```{r, results="hide"}
+```{r, eval=align, results="hide"}
 temp.bam <- "cbp_temp.bam"
 temp.file <- "cbp_metric.txt"
 temp.dir <- "cbp_working"
@@ -837,7 +843,7 @@ for (bam in bam.files) {
 indexBam(bam.files)
 ```
 
-```{r, echo = FALSE, results = 'hide'}
+```{r, eval=align, echo = FALSE, results = 'hide'}
 # Cleaning up
 unlink(all.fastq)
 unlink(temp.dir, recursive=TRUE)
@@ -846,6 +852,10 @@ unlink(temp.file)
 
 Some mapping statistics can be reported as previously described.
 For brevity, the code will not be shown here, as it is identical to that used for the H3K9ac analysis.
+
+```{r, echo=FALSE, results="hide", eval=!align}
+bam.files <- paste0(sra.numbers, ".bam")
+```
 
 ```{r, ref.label="mapstat", echo=FALSE}
 ```
