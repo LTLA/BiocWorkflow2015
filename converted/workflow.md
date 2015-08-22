@@ -50,8 +50,8 @@ The aim is to provide readers with a variety of usage examples from which they c
 
 # Aligning reads in the H3K9ac libraries
 
-The first task is to download the relevant ChIP-seq libraries from the NCBI Gene Expression Omnibus [@edgar2002geo].
-These are obtained using the Sequence Read Accession (SRA) numbers listed below.
+The first task is to download the relevant ChIP-seq libraries from the NCBI Gene Expression Omnibus (GEO) [@edgar2002geo].
+These are obtained from the data series GSE38046, using the Sequence Read Accession (SRA) numbers listed below.
 The experiment contains two biological replicates in total for each of the two cell types, i.e., pro-B and mature B.
 Multiple technical replicates exist for some of the biological replicates, and are indicated as those files with the same `grouping`.
 
@@ -60,22 +60,22 @@ Multiple technical replicates exist for some of the biological replicates, and a
 sra.numbers <- c("SRR499718", "SRR499719", "SRR499720", "SRR499721", 
     "SRR499734", "SRR499735", "SRR499736", "SRR499737", "SRR499738")
 grouping <- c("proB-8113", "proB-8113", "proB-8108", "proB-8108", 
-    "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8059", 
-    "matureB-8086")
-data.frame(SRA=sra.numbers, Condition=grouping)
+    "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8059", "matureB-8086")
+all.sra <- paste0(sra.numbers, ".lite.sra")
+data.frame(SRA=all.sra, Condition=grouping)
 ```
 
 ```
-##         SRA    Condition
-## 1 SRR499718    proB-8113
-## 2 SRR499719    proB-8113
-## 3 SRR499720    proB-8108
-## 4 SRR499721    proB-8108
-## 5 SRR499734 matureB-8059
-## 6 SRR499735 matureB-8059
-## 7 SRR499736 matureB-8059
-## 8 SRR499737 matureB-8059
-## 9 SRR499738 matureB-8086
+##                  SRA    Condition
+## 1 SRR499718.lite.sra    proB-8113
+## 2 SRR499719.lite.sra    proB-8113
+## 3 SRR499720.lite.sra    proB-8108
+## 4 SRR499721.lite.sra    proB-8108
+## 5 SRR499734.lite.sra matureB-8059
+## 6 SRR499735.lite.sra matureB-8059
+## 7 SRR499736.lite.sra matureB-8059
+## 8 SRR499737.lite.sra matureB-8059
+## 9 SRR499738.lite.sra matureB-8086
 ```
 
 These files are downloaded in the SRA format, and need to be unpacked to the FASTQ format prior to alignment.
@@ -83,7 +83,6 @@ This can be done using the `fastq-dump` utility from the [SRA Toolkit](http://ww
 
 
 ```r
-all.sra <- paste0(sra.numbers, ".lite.sra")
 for (sra in all.sra) {
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -390,7 +389,7 @@ lines(win.ab[o], fit$fitted[o], col="red")
 
 ![**Figure 3:** Abundance-dependent trend in the log-fold change between two H3K9ac libraries, across all retained windows. The red line represents a fitted loess curve.](figure/trendplot-1.png) 
 
-Trended biases are refractory to scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
+Trended biases cannot be removed by scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
 Rather, non-linear normalization methods must be used.
 *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* implements a version of the fast loess method [@ballman2004fast] that is adapted to count data.
 This produces a matrix of offsets that can be used during GLM fitting.
@@ -492,7 +491,7 @@ summary(y$trended.dispersion)
 
 The NB dispersion trend is visualized in Figure 5 as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
 A trend that decreases to a plateau with increasing abundance is typical of many analyses, including those of RNA-seq and ChIP-seq data.
-Note that only the trended dispersion will be used here -- the common and tagwise values are only shown for completeness.
+Note that only the trended dispersion will be used here -- the common and tagwise values are only shown for diagnostic purposes.
 
 
 ```r
@@ -968,8 +967,10 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 ### Simple DB across a small region
 
-Both of the above regions are quite large, spanning several kilobases.
-However, *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* is equally capable of detecting sharp DB events.
+Both of the examples above involve differential marking within broad regions spanning several kilobases.
+This is consistent with changes in the marking profile across a large number of nucleosomes.
+However, H3K9ac marking can also be concentrated into small regions, involving only a few nucleosomes.
+*[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* is equally capable of detecting "sharp" DB within these small regions.
 This can be demonstrated by examining those clusters that contain a smaller number of windows.
 
 
@@ -1016,6 +1017,13 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 ![**Figure 10:** Coverage tracks for a sharp and simple DB event in the H3K9ac data set, shown as per-million values.](figure/simplesharpplot-1.png) 
 
+Note that the window size will determine whether sharp or broad events are preferentially detected.
+Larger windows provide more power to detect broad events (as the counts are higher), while smaller windows provide more resolution to detect sharp events.
+Optimal detection of all features can be obtained by performing analyses with multiple window sizes and consolidating the results, 
+    though -- for brevity -- this will not be described here.
+In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
+For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
+
 # Repeating the analysis for the CBP data
 
 ## Overview
@@ -1027,7 +1035,7 @@ Most, if not all, of these sites should be increased in the WT, given that prote
 
 ## Aligning reads from CBP libraries
 
-Libraries are downloaded from the NCBI using the SRA accessions below.
+Libraries are downloaded from the NCBI GEO data series GSE54453, using the SRA accessions listed below.
 The data set contains two biological replicates for each of the two genotypes.
 One file is available for each library, i.e., no technical replicates.
 
@@ -1035,22 +1043,22 @@ One file is available for each library, i.e., no technical replicates.
 ```r
 sra.numbers <- c("SRR1145787", "SRR1145788", "SRR1145789", "SRR1145790")
 genotype <- c("wt", "wt", "ko", "ko")
-data.frame(SRA=sra.numbers, Condition=genotype)
+all.sra <- paste0(sra.numbers, ".sra")
+data.frame(SRA=all.sra, Condition=genotype)
 ```
 
 ```
-##          SRA Condition
-## 1 SRR1145787        wt
-## 2 SRR1145788        wt
-## 3 SRR1145789        ko
-## 4 SRR1145790        ko
+##              SRA Condition
+## 1 SRR1145787.sra        wt
+## 2 SRR1145788.sra        wt
+## 3 SRR1145789.sra        ko
+## 4 SRR1145790.sra        ko
 ```
 
 SRA files are unpacked to yield FASTQ files with the raw read sequences.
 
 
 ```r
-all.sra <- paste0(sra.numbers, ".sra")
 for (sra in all.sra) { 
     code <- system(paste("fastq-dump", sra))
     stopifnot(code==0L)
@@ -1339,6 +1347,7 @@ elementMetadata(out.ranges) <- data.frame(meta, anno)
 
 The top-ranked DB event will be visualized here.
 This corresponds to a simple DB event, as all windows are changing in the same direction, i.e., up in the WT.
+The binding region is also quite small relative to some of the H3K9ac examples, consistent with sharp TF binding to a specific recognition site.
 
 
 ```r
@@ -1400,7 +1409,12 @@ In particular, the core of the workflow -- the detection of DB regions -- is bas
 Analyses are shown for histone mark and TF data sets, with differences in parametrization that are appropriate to each data type.
 Readers are encouraged to apply the concepts and code presented in this article to their own data.
 
-# Session information
+# Software availability
+
+This workflow depends on various packages from version 3.1 of the Bioconductor project, running on *R* version 3.2.0 or higher.
+It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)*, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*, *[Rsamtools](http://bioconductor.org/packages/release/bioc/html/Rsamtools.html)*, *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)*, *[Rtracklayer](http://bioconductor.org/packages/release/bioc/html/Rtracklayer.html)* and *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*.
+It also depends on the annotation packages *[org.Mm.eg.db](http://bioconductor.org/packages/release/data/annotation/html/org.Mm.eg.db.html)* and *[TxDb.Mmusculus.UCSC.mm10.knownGene](http://bioconductor.org/packages/release/data/annotation/html/TxDb.Mmusculus.UCSC.mm10.knownGene.html)*.
+Version numbers for all packages used are shown below.
 
 
 ```r
@@ -1430,7 +1444,7 @@ sessionInfo()
 ##  [3] biomaRt_2.24.0                          
 ##  [4] VennDiagram_1.6.9                       
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.1.2
-##  [6] GenomicFeatures_1.20.2                  
+##  [6] GenomicFeatures_1.20.3                  
 ##  [7] org.Mm.eg.db_3.1.2                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
@@ -1439,7 +1453,7 @@ sessionInfo()
 ## [12] edgeR_3.10.2                            
 ## [13] limma_3.24.15                           
 ## [14] csaw_1.2.1                              
-## [15] rtracklayer_1.28.8                      
+## [15] rtracklayer_1.28.9                      
 ## [16] Rsamtools_1.20.4                        
 ## [17] Biostrings_2.36.3                       
 ## [18] XVector_0.8.0                           
@@ -1462,7 +1476,7 @@ sessionInfo()
 ## [13] zlibbioc_1.14.0           rpart_4.1-10             
 ## [15] proto_0.3-10              splines_3.2.0            
 ## [17] BiocParallel_1.2.20       statmod_1.4.21           
-## [19] foreign_0.8-65            stringr_1.0.0            
+## [19] foreign_0.8-66            stringr_1.0.0            
 ## [21] RCurl_1.95-4.7            munsell_0.4.2            
 ## [23] multtest_2.24.0           nnet_7.3-10              
 ## [25] gridExtra_2.0.0           Hmisc_3.16-0             
@@ -1480,6 +1494,12 @@ sessionInfo()
 ## [49] survival_2.38-3           colorspace_1.2-6         
 ## [51] cluster_2.0.3             VariantAnnotation_1.14.11
 ```
+
+For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
+Readers should note that the read alignment steps for each data set can only be performed on Unix or Mac OS.
+This is because the various `system` calls assume that a Unix-style command-line interface is present.
+In addition, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* is not supported for Windows.
+However, downstream analyses of the BAM files can be performed using any platform on which *R* can be installed.
 
 # Author contributions
 

@@ -28,7 +28,7 @@ cd -
 
 cd converted
 cp ../markdown/workflow.md .
-ln -sf ../markdown/figure
+rsync -azv --delete ../markdown/figure . --exclude=".svn"
 R -e "rmarkdown::render('workflow.md')"
 
 pandoc -t latex workflow.md --bibliography ref.bib \
