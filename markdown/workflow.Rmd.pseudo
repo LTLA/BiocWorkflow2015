@@ -1,10 +1,12 @@
 ---
 title: "From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data"
 author: 
-  - name: Aaron T. L. Lun^1,2^
-    affiliation: ^1^The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; ^2^Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-  - name: Gordon K. Smyth^1,3^
-    affiliation: ^3^Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+  - name: Aaron T. L. Lun
+    affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+    email: alun@wehi.edu.au
+  - name: Gordon K. Smyth
+    affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+    email: smyth@wehi.edu.au
 date: 22-08-2015
 output: 
     BiocStyle::html_document:
