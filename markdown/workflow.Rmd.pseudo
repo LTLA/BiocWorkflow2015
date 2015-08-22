@@ -3,10 +3,8 @@ title: "From reads to regions: a Bioconductor workflow to detect differential bi
 author: 
   - name: Aaron T. L. Lun
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-    email: alun@wehi.edu.au
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-    email: smyth@wehi.edu.au
 date: 22-08-2015
 output: 
     BiocStyle::html_document:
