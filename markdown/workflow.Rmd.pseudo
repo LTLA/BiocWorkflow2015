@@ -12,7 +12,6 @@ output:
 bibliography: ref.bib
 ---
 
-<!-- rmarkdown v1 -->
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{ChIP-seq workflow to detect differential binding}
@@ -22,7 +21,7 @@ bibliography: ref.bib
 library(BiocStyle)
 library(knitr)
 opts_chunk$set(error=FALSE)
-biocbuild <- FALSE
+biocbuild <- FALSE # BioC build starts from BAM files, not SRA.
 ```
 
 # Introduction
@@ -155,8 +154,8 @@ bam.files <- paste0(names(by.group), ".bam")
 core.loc <- "http://s3.amazonaws.com/chipseqdb-bamfiles/"
 for (bam in bam.files) { # Downloading all files.
     bam.url <- paste0(core.loc, bam)
-    download.file(bam.url, bam, quiet=TRUE)
-    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"), quiet=TRUE)
+    download.file(bam.url, bam)
+    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"))
 }
 ```
 
@@ -213,9 +212,9 @@ The new blacklist coordinates are then saved to file for future use.
 
 ```{r, eval=biocbuild, message=FALSE, echo=FALSE, results="hide"}
 chain.file <- "mm9ToMm10.over.chain"
-download.file(paste0(core.loc, chain.file), chain.file, quiet=TRUE)
+download.file(paste0(core.loc, chain.file), chain.file)
 bed.file <- "mm9-blacklist.bed"
-download.file(paste0(core.loc, bed.file), bed.file, quiet=TRUE)
+download.file(paste0(core.loc, bed.file), bed.file)
 ```
 
 ```{r, message=FALSE}
@@ -888,8 +887,8 @@ For brevity, the code will not be shown here, as it is identical to that used fo
 bam.files <- paste0(sra.numbers, ".bam")
 for (bam in bam.files) {
     bam.url <- paste0(core.loc, bam)
-    download.file(bam.url, bam, quiet=TRUE)
-    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"), quiet=TRUE)
+    download.file(bam.url, bam)
+    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"))
 }
 ```
 
