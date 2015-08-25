@@ -146,6 +146,12 @@ library(Rsamtools)
 library(Rsubread)
 by.group <- split(all.sra, grouping)
 bam.files <- paste0(names(by.group), ".bam")
+core.loc <- "http://s3.amazonaws.com/chipseqdb-bamfiles/"
+for (bam in bam.files) { # Downloading all files.
+    bam.url <- paste0(core.loc, bam),
+    download.file(bam.url, bam, quiet=TRUE)
+    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"), quiet=TRUE)
+}
 ```
 
 ```{r mapstat}
@@ -198,6 +204,13 @@ This is done using the `liftOver` function in the `r Biocpkg("rtracklayer")` pac
 The chain file specifies the corresponding coordinates between the two builds and can be obtained 
     [here](http://hgdownload-test.cse.ucsc.edu/goldenPath/mm9/liftOver/mm9ToMm10.over.chain.gz).
 The new blacklist coordinates are then saved to file for future use.
+
+```{r, eval=biocbuild, message=FALSE, echo=FALSE, results="hide"}
+chain.file <- "mm9ToMm10.over.chain"
+download.file(paste0(core.loc, chain.file), chain.file, quiet=TRUE)
+bed.file <- "mm9-blacklist.bed"
+download.file(paste0(core.loc, bed.file), bed.file, quiet=TRUE)
+```
 
 ```{r, message=FALSE}
 library(rtracklayer)
@@ -782,6 +795,10 @@ Optimal detection of all features can be obtained by performing analyses with mu
 In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
 For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
 
+```{r, eval=biocbuild, echo=FALSE, results="hide"}
+unlink(bam.files)
+```
+
 # Repeating the analysis for the CBP data
 
 ## Overview
@@ -857,6 +874,11 @@ For brevity, the code will not be shown here, as it is identical to that used fo
 
 ```{r, echo=FALSE, results="hide", eval=biocbuild}
 bam.files <- paste0(sra.numbers, ".bam")
+for (bam in bam.files) {
+    bam.url <- paste0(core.loc, bam),
+    download.file(bam.url, bam, quiet=TRUE)
+    download.file(paste0(bam.url, ".bai"), paste0(bam, ".bai"), quiet=TRUE)
+}
 ```
 
 ```{r, ref.label="mapstat", echo=FALSE}
@@ -1056,6 +1078,10 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 ```
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
+
+```{r, eval=biocbuild, echo=FALSE, results="hide"}
+unlink(bam.files)
+```
 
 # Summary  
 
