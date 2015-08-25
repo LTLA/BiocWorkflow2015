@@ -36,3 +36,9 @@ pandoc -t latex workflow.md --bibliography ref.bib \
     --highlight-style tango > workflow.tex
 cd -
 
+# We also need to convert the R markdown into something that BioC can compile.
+# This involves flipping the align flag to FALSE, as we're starting off from
+# the BAM files. The BioC build system doesn't have the command line utilities we need.
+
+cat markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" | sed "s/=biocbuild/=TRUE/" | sed "s/=\!biocbuild/=FALSE/" > bioC/chipseq_db.Rmd
+cp converted/ref.bib bioC
