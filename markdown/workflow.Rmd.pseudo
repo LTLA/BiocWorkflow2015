@@ -409,6 +409,11 @@ Estimation of the NB dispersion is then performed.
 Specifically, a NB dispersion trend is fitted to all windows against the average abundance.
 This means that empirical mean-dispersion trends can be flexibly modelled.
 
+```{r, message=FALSE, echo=FALSE, results="hide"}
+library(statmod)
+library(locfit)
+```
+
 ```{r, message=FALSE}
 library(edgeR)
 y <- asDGEList(filtered.data)
