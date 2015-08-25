@@ -797,6 +797,7 @@ For larger windows, detection may be confounded by other events within the windo
 
 ```{r, eval=biocbuild, echo=FALSE, results="hide"}
 unlink(bam.files)
+unlink(paste0(bam.files, ".bai"))
 ```
 
 # Repeating the analysis for the CBP data
@@ -1081,6 +1082,7 @@ Note that that the `gax` and `greg` objects are the same as those used in the vi
 
 ```{r, eval=biocbuild, echo=FALSE, results="hide"}
 unlink(bam.files)
+unlink(paste0(bam.files, ".bai"))
 ```
 
 # Summary  
