@@ -12,6 +12,12 @@ output:
 bibliography: ref.bib
 ---
 
+<!-- rmarkdown v1 -->
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{ChIP-seq workflow to detect differential binding}
+-->
+
 ```{r style, echo=FALSE, results='hide', message=FALSE}
 library(BiocStyle)
 library(knitr)
