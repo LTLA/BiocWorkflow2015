@@ -11,9 +11,9 @@ mv temp2.tex temp.tex
 cat temp.tex | sed -n -e '/\\section{Introduction}/,$p' > temp2.tex
 mv temp2.tex temp.tex
 
-for x in compoplot simplebroadplot simplesharplot tfplot complexplot
+for x in compoplot simplebroadplot simplesharpplot tfplot complexplot
 do
-    cat temp.tex | sed "s/includegraphics{$x/includegraphics[width=\\maxwidth]{$x/" > temp2.tex
+    cat temp.tex | sed "s/includegraphics{$x/includegraphics[width=\\\\maxwidth]{$x/" > temp2.tex
     mv temp2.tex temp.tex
 done
 
