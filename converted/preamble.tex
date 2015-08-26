@@ -10,7 +10,7 @@
 % For more detailed article preparation guidelines, please see:
 % http://f1000research.com/author-guidelines and http://f1000research.com/data-preparation
 
-\documentclass[10pt,a4paper,twocolumn]{article}
+\documentclass[10pt,a4paper]{article}
 \usepackage{f1000_styles}
 
 \usepackage[style=authoryear]{biblatex}
@@ -46,7 +46,7 @@
 % Scale images if necessary, so that they will not overflow the page
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setkeys{Gin}{width=0.6\maxwidth,height=\maxheight,keepaspectratio}
 \ifxetex
   \usepackage[setpagesize=false, % page size defined by xetex
               unicode=false, % unicode breaks when used with xetex
@@ -82,6 +82,10 @@ binding in ChIP-seq data}
 \affil[2]{Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia}
 \affil[3]{Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
 }
+
+% Allowing the large floats to have some text in those pages.
+\renewcommand{\topfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
 
 \begin{document}
 
