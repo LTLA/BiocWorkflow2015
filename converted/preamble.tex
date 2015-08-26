@@ -91,7 +91,15 @@ binding in ChIP-seq data}
 
 \begin{abstract}
 
-Abstracts should be up to 300 words and provide a succinct summary of the article. Although the abstract should explain why the article might be interesting, care should be taken not to inappropriately over-emphasise the importance of the work described in the article. Citations should not be used in the abstract, and the use of abbreviations should be minimized. 
+Chromatin immunoprecipitation with massively parallel sequencing (ChIP-seq) is widely used to identify the genomic binding sites for protein of interest.
+Most conventional approaches to ChIP-seq data analysis involve the detection of the absolute presence (or absence) of a binding site.
+However, an alternative strategy is to identify changes in the binding intensity between two biological conditions, i.e., differential binding (DB).
+This may yield more relevant results than conventional analyses, as changes in binding can be associated with the biological difference being investigated.
+The aim of this article is to facilitate the implementation of DB analyses, by comprehensively describing a computational workflow for the detection of DB regions from ChIP-seq data.
+The workflow is based primarily on R software packages from the open-source Bioconductor project and covers all steps of the analysis pipeline, from alignment of read sequences to interpretation and visualization of putative DB regions. 
+In particular, detection of DB regions will be conducted using the counts for sliding windows from the csaw package, with statistical modelling performed using methods in the edgeR package. 
+Analyses will be demonstrated on real histone mark and transcription factor data sets.
+This will provide readers with practical usage examples that can be applied in their own studies.
 
 \end{abstract}
 \listoftodos[F1000Research review comments] % Ignore until review stage
