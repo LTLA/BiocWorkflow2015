@@ -12,6 +12,11 @@ output:
 bibliography: ref.bib
 ---
 
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{ChIP-seq workflow to detect differential binding}
+-->
+
 
 
 # Introduction
@@ -33,24 +38,25 @@ Peak-based methods are implemented in the *[DiffBind](http://bioconductor.org/pa
     which count reads into peak intervals that have been identified with software like MACS [@zhang2008macs].
 This requires some care to maintain statistical rigour, as peaks are called with the same data used to test for DB.
 Alternatively, window-based approaches count reads into sliding windows across the genome.
-This is a more direct approach that avoids problems with data re-use and can provide increased DB detection power [@lun2014denovo].
+This is a more direct strategy that avoids problems with data re-use and can provide increased DB detection power [@lun2014denovo].
+However, its correct implementation is not straightforward due to the subtleties with interpretation of the false dicovery rate (FDR).
 
-This article describes a workflow for performing a window-based DB analysis, 
-    based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating].
-It contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
+This article describes a computational workflow for performing a DB analysis with sliding windows, in order to facilitate the practical implementation of the window-based strategy.
+The workflow is based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating] 
+    and contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
 Reads are first aligned to the genome using the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
 These are counted into sliding windows with *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, to quantify binding intensity across the genome [@lun2014denovo].
 Statistical modelling is based on the negative binomial (NB) distribution with generalized linear models (GLMs) 
     in the *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)* package [@robinson2010edger; @mccarthy2012differential], 
     with additional sophistication provided by quasi-likelihood (QL) methods [@lund2012ql].
-Code is also provided for filtering, normalization and region-level control of the false discovery rate (FDR).
+Code is also provided for filtering, normalization and region-level control of the FDR.
 Finally, annotation and visualization of the DB regions is described.
 
 The application of the methods in this article will be demonstrated on two publicly available ChIP-seq data sets.
 The first data set studies changes in H3K9ac marking between pro-B and mature B cells [@domingo2012bcell].
 The second data set studies changes in CREB-binding protein (CBP) binding between wild-type and CBP knock-out cells [@kasper2014genomewide].
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
-The aim is to provide readers with a variety of usage examples from which they can construct analyses of their own data.
+The aim is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
 
 # Aligning reads in the H3K9ac libraries
 
@@ -114,7 +120,7 @@ Here, a consensus threshold of 2 is used instead of the default of 3, to accommo
 
 
 ```r
-require(Rsubread)
+library(Rsubread)
 bam.files <- paste0(names(by.group), ".bam")
 align(index="index/mm10", readfile1=group.fastq, TH1=2, 
     input_format="FASTQ", output_file=bam.files)
@@ -126,7 +132,7 @@ This is required for input into *[csaw](http://bioconductor.org/packages/release
 
 
 ```r
-require(Rsamtools)
+library(Rsamtools)
 for (bam in bam.files) {
     out <- suppressWarnings(sortBam(bam, "h3k9ac_temp"))
     file.rename(out, bam)
@@ -154,6 +160,8 @@ for (bam in bam.files) {
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+
+
 
 
 ```r
@@ -211,8 +219,10 @@ The chain file specifies the corresponding coordinates between the two builds an
 The new blacklist coordinates are then saved to file for future use.
 
 
+
+
 ```r
-require(rtracklayer)
+library(rtracklayer)
 ch <- import.chain("mm9ToMm10.over.chain")
 original <- import("mm9-blacklist.bed")
 blacklist <- liftOver(x=original, chain=ch)
@@ -255,7 +265,7 @@ Reads are also ignored if they map within blacklist regions or if they do not ma
 
 
 ```r
-require(csaw)
+library(csaw)
 param <- readParam(minq=50, discard=blacklist,
     restrict=paste0("chr", c(1:19, "X", "Y")))
 ```
@@ -480,8 +490,10 @@ Specifically, a NB dispersion trend is fitted to all windows against the average
 This means that empirical mean-dispersion trends can be flexibly modelled.
 
 
+
+
 ```r
-require(edgeR)
+library(edgeR)
 y <- asDGEList(filtered.data)
 y$offset <- offsets
 y <- estimateDisp(y, design)
@@ -730,8 +742,8 @@ Multiple overlapping features for different genes are separated by commas within
 
 
 ```r
-require(org.Mm.eg.db)
-require(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(org.Mm.eg.db)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 anno <- detailRanges(out.ranges, orgdb=org.Mm.eg.db,
     txdb=TxDb.Mmusculus.UCSC.mm10.knownGene)
 head(anno$overlap)
@@ -784,7 +796,7 @@ Gene coordinates are taken from the NCBI mouse 38 annotation, which is roughly e
 
 
 ```r
-require(ChIPpeakAnno)
+library(ChIPpeakAnno)
 data(TSS.mouse.GRCm38)
 minimal <- out.ranges
 elementMetadata(minimal) <- NULL
@@ -849,7 +861,7 @@ The other is the annotation track containing gene models, with gene IDs replaced
 
 
 ```r
-require(Gviz)
+library(Gviz)
 gax <- GenomeAxisTrack(col="black", fontsize=15)
 greg <- GeneRegionTrack(TxDb.Mmusculus.UCSC.mm10.knownGene, showId=TRUE, 
     geneSymbol=TRUE, name="UCSC genes", col.title="black")
@@ -1028,6 +1040,8 @@ Optimal detection of all features can be obtained by performing analyses with mu
 In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
 For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
 
+
+
 # Repeating the analysis for the CBP data
 
 ## Overview
@@ -1107,6 +1121,8 @@ indexBam(bam.files)
 
 Some mapping statistics can be reported as previously described.
 For brevity, the code will not be shown here, as it is identical to that used for the H3K9ac analysis.
+
+
 
 
 ```
@@ -1401,9 +1417,11 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 12:** Coverage tracks for TF binding sites that are differentially bound in the WT against the KO. Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
+![**Figure 12:** Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
+
+
 
 # Summary  
 
@@ -1456,47 +1474,48 @@ sessionInfo()
 ## [11] Biobase_2.28.0                          
 ## [12] edgeR_3.10.2                            
 ## [13] limma_3.24.15                           
-## [14] csaw_1.2.1                              
-## [15] rtracklayer_1.28.9                      
-## [16] Rsamtools_1.20.4                        
-## [17] Biostrings_2.36.3                       
-## [18] XVector_0.8.0                           
-## [19] GenomicRanges_1.20.5                    
-## [20] GenomeInfoDb_1.4.2                      
-## [21] IRanges_2.2.7                           
-## [22] S4Vectors_0.6.3                         
-## [23] BiocGenerics_0.14.0                     
-## [24] Rsubread_1.18.0                         
-## [25] knitr_1.11                              
-## [26] BiocStyle_1.6.0                         
+## [14] locfit_1.5-9.1                          
+## [15] statmod_1.4.21                          
+## [16] csaw_1.2.1                              
+## [17] rtracklayer_1.28.9                      
+## [18] Rsamtools_1.20.4                        
+## [19] Biostrings_2.36.4                       
+## [20] XVector_0.8.0                           
+## [21] GenomicRanges_1.20.5                    
+## [22] GenomeInfoDb_1.4.2                      
+## [23] IRanges_2.2.7                           
+## [24] S4Vectors_0.6.3                         
+## [25] BiocGenerics_0.14.0                     
+## [26] Rsubread_1.18.0                         
+## [27] knitr_1.11                              
+## [28] BiocStyle_1.6.0                         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.0               locfit_1.5-9.1           
-##  [3] biovizBase_1.16.0         lattice_0.20-33          
-##  [5] GO.db_3.1.2               digest_0.6.8             
-##  [7] plyr_1.8.3                futile.options_1.0.0     
-##  [9] acepack_1.3-3.3           evaluate_0.7.2           
-## [11] ggplot2_1.0.1             BiocInstaller_1.18.4     
-## [13] zlibbioc_1.14.0           rpart_4.1-10             
-## [15] proto_0.3-10              splines_3.2.0            
-## [17] BiocParallel_1.2.20       statmod_1.4.21           
-## [19] foreign_0.8-66            stringr_1.0.0            
-## [21] RCurl_1.95-4.7            munsell_0.4.2            
-## [23] multtest_2.24.0           nnet_7.3-10              
-## [25] gridExtra_2.0.0           Hmisc_3.16-0             
-## [27] matrixStats_0.14.2        XML_3.98-1.3             
-## [29] GenomicAlignments_1.4.1   MASS_7.3-43              
-## [31] bitops_1.0-6              RBGL_1.44.0              
-## [33] gtable_0.1.2              magrittr_1.5             
-## [35] formatR_1.2               scales_0.2.5             
-## [37] graph_1.46.0              KernSmooth_2.23-15       
-## [39] stringi_0.5-5             reshape2_1.4.1           
-## [41] latticeExtra_0.6-26       futile.logger_1.4.1      
-## [43] Formula_1.2-1             lambda.r_1.1.7           
-## [45] RColorBrewer_1.1-2        tools_3.2.0              
-## [47] dichromat_2.0-0           BSgenome_1.36.3          
-## [49] survival_2.38-3           colorspace_1.2-6         
-## [51] cluster_2.0.3             VariantAnnotation_1.14.11
+##  [1] Rcpp_0.12.0               biovizBase_1.16.0        
+##  [3] lattice_0.20-33           GO.db_3.1.2              
+##  [5] digest_0.6.8              plyr_1.8.3               
+##  [7] futile.options_1.0.0      acepack_1.3-3.3          
+##  [9] evaluate_0.7.2            ggplot2_1.0.1            
+## [11] BiocInstaller_1.18.4      zlibbioc_1.14.0          
+## [13] rpart_4.1-10              proto_0.3-10             
+## [15] splines_3.2.0             BiocParallel_1.2.20      
+## [17] foreign_0.8-66            stringr_1.0.0            
+## [19] RCurl_1.95-4.7            munsell_0.4.2            
+## [21] multtest_2.24.0           nnet_7.3-10              
+## [23] gridExtra_2.0.0           Hmisc_3.16-0             
+## [25] matrixStats_0.14.2        XML_3.98-1.3             
+## [27] GenomicAlignments_1.4.1   MASS_7.3-43              
+## [29] bitops_1.0-6              RBGL_1.44.0              
+## [31] gtable_0.1.2              magrittr_1.5             
+## [33] formatR_1.2               scales_0.2.5             
+## [35] graph_1.46.0              KernSmooth_2.23-15       
+## [37] stringi_0.5-5             reshape2_1.4.1           
+## [39] latticeExtra_0.6-26       futile.logger_1.4.1      
+## [41] Formula_1.2-1             lambda.r_1.1.7           
+## [43] RColorBrewer_1.1-2        tools_3.2.0              
+## [45] dichromat_2.0-0           BSgenome_1.36.3          
+## [47] survival_2.38-3           colorspace_1.2-6         
+## [49] cluster_2.0.3             VariantAnnotation_1.14.11
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).

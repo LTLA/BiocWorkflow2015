@@ -1,4 +1,4 @@
-pandoc -t latex workflow.md --bibliography ref.bib --biblatex \
+pandoc -t latex workflow.md --bibliography ref.bib --biblatex --no-wrap \
     --template ~/Software/R/current/library/rmarkdown/rmd/latex/default.tex \
     --highlight-style tango > temp.tex
 
