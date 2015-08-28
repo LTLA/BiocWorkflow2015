@@ -41,22 +41,28 @@ Alternatively, window-based approaches count reads into sliding windows across t
 This is a more direct strategy that avoids problems with data re-use and can provide increased DB detection power [@lun2014denovo].
 However, its correct implementation is not straightforward due to the subtleties with interpretation of the false dicovery rate (FDR).
 
-This article describes a computational workflow for performing a DB analysis with sliding windows, in order to facilitate the practical implementation of the window-based strategy.
-The workflow is based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating] 
-    and contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
+This article describes a computational workflow for performing a DB analysis with sliding windows.
+The aim is to facilitate the practical implementation of window-based DB analyses, by providing detailed code and expected output.
+The workflow described here applies to any ChIP-seq experiment with multiple experimental conditions and with multiple biological samples within one or more of the conditions.
+It detects and summarizes DB regions between conditions in a *de novo* manner, i.e., without making any prior assumptions about the location or width of bound regions.
+Detected regions are then annotated according to their proximity to annotated genes.
+In addition, the code can be easily adapted to accommodate batch effects, covariates and multiple experimental factors.
+
+The workflow is based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating].
+It contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
 Reads are first aligned to the genome using the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
 These are counted into sliding windows with *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, to quantify binding intensity across the genome [@lun2014denovo].
 Statistical modelling is based on the negative binomial (NB) distribution with generalized linear models (GLMs) 
     in the *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)* package [@robinson2010edger; @mccarthy2012differential], 
     with additional sophistication provided by quasi-likelihood (QL) methods [@lund2012ql].
 Code is also provided for filtering, normalization and region-level control of the FDR.
-Finally, annotation and visualization of the DB regions is described.
+Finally, annotation and visualization of the DB regions is described using *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)* and other packages.
 
 The application of the methods in this article will be demonstrated on two publicly available ChIP-seq data sets.
 The first data set studies changes in H3K9ac marking between pro-B and mature B cells [@domingo2012bcell].
 The second data set studies changes in CREB-binding protein (CBP) binding between wild-type and CBP knock-out cells [@kasper2014genomewide].
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
-The aim is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
+The intention is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
 
 # Aligning reads in the H3K9ac libraries
 
@@ -1507,7 +1513,7 @@ sessionInfo()
 ## [27] GenomicAlignments_1.4.1   MASS_7.3-43              
 ## [29] bitops_1.0-6              RBGL_1.44.0              
 ## [31] gtable_0.1.2              magrittr_1.5             
-## [33] formatR_1.2               scales_0.2.5             
+## [33] formatR_1.2               scales_0.3.0             
 ## [35] graph_1.46.0              KernSmooth_2.23-15       
 ## [37] stringi_0.5-5             reshape2_1.4.1           
 ## [39] latticeExtra_0.6-26       futile.logger_1.4.1      
