@@ -4,7 +4,7 @@
 # markdown doesn't have particularly good support for figure labelling - at least,
 # not in a flexible manner that works for both LaTeX and HTML. Instead, we hard-code
 # the figure numbers into the markdown text, so that it makes sense in all downstream
-# applications. FIgure numbers are also hardcoded into the captions, which means that
+# applications. Figure numbers are also hardcoded into the captions, which means that
 # you need to specify empty captions within LaTeX.
 
 cd markdown
@@ -23,22 +23,20 @@ Rscript compile.R workflow
 cd -
 
 # The next step is to convert the markdown into a format of choice. Here, we convert
-# it to HTML using render(), but it's also possible to convert to TeX via pandoc 
-# (you need the TeX template from rmarkdown to define the environments, though).
+# it to HTML using render(), but it's also possible to convert to TeX via pandoc. This
+# is done using the 'toTex' script, which adds the necessary preamble for F1000Research.
 
 cd converted
 cp ../markdown/workflow.md .
 rsync -azv --delete ../markdown/figure . --exclude=".svn"
 R -e "rmarkdown::render('workflow.md')"
 
-pandoc -t latex workflow.md --bibliography ref.bib \
-    --template ~/Software/R/current/library/rmarkdown/rmd/latex/default.tex \
-    --highlight-style tango > workflow.tex
+./toTex.sh
 cd -
 
 # We also need to convert the R markdown into something that BioC can compile.
 # This involves flipping the align flag to FALSE, as we're starting off from
 # the BAM files. The BioC build system doesn't have the command line utilities we need.
 
-cat markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" | sed "s/=biocbuild/=TRUE/" | sed "s/=\!biocbuild/=FALSE/" > bioC/chipseq_db.Rmd
+cat markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" > bioC/chipseq_db.Rmd
 cp converted/ref.bib bioC
