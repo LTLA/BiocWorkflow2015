@@ -42,7 +42,7 @@ This is a more direct strategy that avoids problems with data re-use and can pro
 However, its correct implementation is not straightforward due to the subtleties with interpretation of the false dicovery rate (FDR).
 
 This article describes a computational workflow for performing a DB analysis with sliding windows.
-The aim is to facilitate the practical implementation of window-based DB analyses, by providing detailed code and expected output.
+The aim is to facilitate the practical implementation of window-based DB analyses by providing detailed code and expected output.
 The workflow described here applies to any ChIP-seq experiment with multiple experimental conditions and with multiple biological samples within one or more of the conditions.
 It detects and summarizes DB regions between conditions in a *de novo* manner, i.e., without making any prior assumptions about the location or width of bound regions.
 Detected regions are then annotated according to their proximity to annotated genes.
