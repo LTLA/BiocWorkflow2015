@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 22-08-2015
+date: 27-08-2015
 output: 
     BiocStyle::html_document:
         fig_caption: yes
@@ -402,12 +402,9 @@ adjc <- log2(assay(filtered.data)+0.5)
 logfc <- adjc[,1] - adjc[,4]
 smoothScatter(win.ab, logfc, ylim=c(-6, 6), xlim=c(0, 5),
     xlab="Average abundance", ylab="Log-fold change")
-fit <- limma::loessFit(x=win.ab, y=logfc)
-o <- order(win.ab)
-lines(win.ab[o], fit$fitted[o], col="red")
 ```
 
-![**Figure 3:** Abundance-dependent trend in the log-fold change between two H3K9ac libraries, across all retained windows. The red line represents a fitted loess curve.](figure/trendplot-1.png) 
+![**Figure 3:** Abundance-dependent trend in the log-fold change between two H3K9ac libraries (mature B over pro-B), across all windows retained after filtering.](figure/trendplot-1.png) 
 
 Trended biases cannot be removed by scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
 Rather, non-linear normalization methods must be used.
@@ -441,11 +438,9 @@ norm.adjc <- adjc - offsets/log(2)
 norm.fc <- norm.adjc[,1]-norm.adjc[,4]
 smoothScatter(win.ab, norm.fc, ylim=c(-6, 6), xlim=c(0, 5),
     xlab="Average abundance", ylab="Log-fold change")
-fit <- limma::loessFit(x=win.ab, y=norm.fc)
-lines(win.ab[o], fit$fitted[o], col="red")
 ```
 
-![**Figure 4:** Effect of non-linear normalization on the trended bias between two H3K9ac libraries. Log-fold changes for all windows are shown after normalization. The red line represents a fitted loess curve.](figure/normplot-1.png) 
+![**Figure 4:** Effect of non-linear normalization on the trended bias between two H3K9ac libraries. Log-fold changes for all windows are shown after normalization.](figure/normplot-1.png) 
 
 The implicit assumption of non-linear methods is that most windows at each abundance are not DB.
 Any systematic difference between libraries is attributed to bias and is removed.
