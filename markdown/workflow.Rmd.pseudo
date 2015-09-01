@@ -26,7 +26,7 @@ biocbuild <- FALSE # BioC build starts from BAM files, not SRA.
 
 # Introduction
 
-Chomatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
+Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
 Conventional analyses of ChIP-seq data aim to detect absolute binding (i.e., the presence or absence of a binding sites) based on peaks in the read coverage.
 However, a number of recent studies have focused on the detection of changes in the binding profile between conditions [@rossinnes2012differential; @pal2013global].
 These differential binding (DB) analyses involve counting reads into genomic intervals, and then testing those counts for significant differences between conditions.
@@ -44,7 +44,7 @@ Peak-based methods are implemented in the `r Biocpkg("DiffBind")` and `r Biocpkg
 This requires some care to maintain statistical rigour, as peaks are called with the same data used to test for DB.
 Alternatively, window-based approaches count reads into sliding windows across the genome.
 This is a more direct strategy that avoids problems with data re-use and can provide increased DB detection power [@lun2014denovo].
-However, its correct implementation is not straightforward due to the subtleties with interpretation of the false dicovery rate (FDR).
+However, its correct implementation is not straightforward due to the subtleties with interpretation of the false discovery rate (FDR).
 
 This article describes a computational workflow for performing a DB analysis with sliding windows.
 The aim is to facilitate the practical implementation of window-based DB analyses by providing detailed code and expected output.
