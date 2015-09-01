@@ -785,7 +785,7 @@ if (!overlapsAny(cur.region, GRanges("chr16", IRanges(36665551, 36666200)), type
 
 Marking is increased for mature B cells within a 500 bp region (Figure ((simplesharpplot))), which is sharper than the changes in the previous two examples.
 This also coincides with the promoter of the *Cd86* gene.
-Again, this makes biological sense as Cd86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
+Again, this makes biological sense as CD86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
 	
 ```{r simplesharpplot, fig.width=8, fig.height=6, fig.cap="Coverage tracks for a sharp and simple DB event in the H3K9ac data set, shown as per-million values."}
 collected <- list()
