@@ -35,8 +35,7 @@ R -e "rmarkdown::render('workflow.md')"
 cd -
 
 # We also need to convert the R markdown into something that BioC can compile.
-# This involves flipping the align flag to FALSE, as we're starting off from
-# the BAM files. The BioC build system doesn't have the command line utilities we need.
+# This is done using the 'toBioC.sh' script, which flips some flags and modifies the
+# YAML metadata so that it is compatible with BioC's build system.
 
-cat markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" > bioC/chipseq_db.Rmd
-cp converted/ref.bib bioC
+./toBioC.sh
