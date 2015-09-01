@@ -371,7 +371,7 @@ offsets <- normalize(filtered.data, type="loess")
 head(offsets)
 ```
 
-The effect of non-linear normalization can be visualized a mean-difference plot comparing the first and last libraries.
+The effect of non-linear normalization can be visualized with a mean-difference plot comparing the first and last libraries.
 Once the offsets are applied to adjust the log-fold changes, the trend is eliminated from the plot (Figure ((normplot))).
 The cloud of points is also centred at a log-fold change of zero.
 This indicates that normalization was successful in removing the differences between libraries. 
@@ -495,7 +495,7 @@ head(res$table)
 One might attempt to control the FDR by applying the Benjamini-Hochberg (BH) method to the window-level *p*-values [@benjamini1995controlling].
 However, the features of interest are not windows, but the genomic regions that they represent.
 Control of the FDR across windows does not guarantee control of the FDR across regions [@lun2014denovo].
-The latter is arguably more relevant for the final intepretation of the results.
+The latter is arguably more relevant for the final interpretation of the results.
 
 Control of the region-level FDR can be provided by aggregating windows into regions and combining the *p*-values.
 Here, adjacent windows less than 100 bp apart are aggregated into clusters.
@@ -730,7 +730,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 ### Complex DB across a broad region
 
-Complex DB refers to situations where multiple DB events are occuring within the same enriched region.
+Complex DB refers to situations where multiple DB events are occurring within the same enriched region.
 These are identified as those clusters that contain windows changing in both directions.
 Here, the second-ranking complex cluster is selected for visualization 
     (the top-ranking complex cluster is adjacent to the region used in the previous example, so another region is chosen for some variety).
