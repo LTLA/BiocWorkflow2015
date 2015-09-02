@@ -681,9 +681,9 @@ The other is the annotation track containing gene models, with gene IDs replaced
 
 ```{r, message=FALSE}
 library(Gviz)
-gax <- GenomeAxisTrack(col="black", fontsize=15)
+gax <- GenomeAxisTrack(col="black", fontsize=15, size=2)
 greg <- GeneRegionTrack(TxDb.Mmusculus.UCSC.mm10.knownGene, showId=TRUE, 
-    geneSymbol=TRUE, name="UCSC genes", col.title="black")
+    geneSymbol=TRUE, name="", background.title="transparent")
 symbols <- unlist(mapIds(org.Mm.eg.db, gene(greg), "SYMBOL", 
     "ENTREZID", multiVals = "first"))
 symbol(greg) <- symbols[gene(greg)]
@@ -758,7 +758,7 @@ for (i in 1:length(bam.files)) {
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
         name=bam.files[i], col.axis="black", col.title="black",
-    	fill="darkgray", col.histogram=NA)
+        fill="darkgray", col.histogram=NA)
 }
 plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)),
     from=start(cur.region), to=end(cur.region))
@@ -795,7 +795,7 @@ for (i in 1:length(bam.files)) {
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
         name=bam.files[i], col.axis="black", col.title="black",
-	fill="darkgray", col.histogram=NA)
+        fill="darkgray", col.histogram=NA)
 }
 plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)),
     from=start(cur.region), to=end(cur.region))
