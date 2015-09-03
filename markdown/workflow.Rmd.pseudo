@@ -136,6 +136,14 @@ for (bam in bam.files) {
 Potential PCR duplicates are marked using the `MarkDuplicates` tool from the [Picard software suite](http://broadinstitute.github.io/picard).
 These are identified as alignments at the same genomic location, such that they may have originated from PCR-amplified copies of the same DNA fragment.
 
+```{r killindex, echo=FALSE, results="hide", message=FALSE, eval=!biocbuild}
+# For some reason, MarkDuplicates uses BAM index files if they're available; but we don't
+# want it using old indices, so we delete them beforehand if any are present.
+indices <- paste0(bam.files, ".bai")
+exist.indices <- file.exists(indices)
+if (any(exist.indices)) { unlink(indices[exist.indices]) }
+```
+
 ```{r, eval=!biocbuild}
 temp.bam <- "h3k9ac_temp.bam"
 temp.file <- "h3k9ac_metric.txt"
@@ -857,6 +865,9 @@ align(index="index/mm10", readfile1=all.fastq, phredOffset=64,
 
 Alignments in each BAM file are sorted by coordinate.
 Duplicate reads are marked, and the resulting files are indexed.
+
+```{r, ref.label="killindex", echo=FALSE, results="hide", message=FALSE, eval=!biocbuild}
+```
 
 ```{r, eval=!biocbuild, results="hide"}
 temp.bam <- "cbp_temp.bam"
