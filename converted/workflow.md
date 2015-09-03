@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 27-08-2015
+date: 1 September 2015
 output: 
     BiocStyle::html_document:
         fig_caption: yes
@@ -21,7 +21,7 @@ bibliography: ref.bib
 
 # Introduction
 
-Chomatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
+Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
 Conventional analyses of ChIP-seq data aim to detect absolute binding (i.e., the presence or absence of a binding sites) based on peaks in the read coverage.
 However, a number of recent studies have focused on the detection of changes in the binding profile between conditions [@rossinnes2012differential; @pal2013global].
 These differential binding (DB) analyses involve counting reads into genomic intervals, and then testing those counts for significant differences between conditions.
@@ -39,7 +39,7 @@ Peak-based methods are implemented in the *[DiffBind](http://bioconductor.org/pa
 This requires some care to maintain statistical rigour, as peaks are called with the same data used to test for DB.
 Alternatively, window-based approaches count reads into sliding windows across the genome.
 This is a more direct strategy that avoids problems with data re-use and can provide increased DB detection power [@lun2014denovo].
-However, its correct implementation is not straightforward due to the subtleties with interpretation of the false dicovery rate (FDR).
+However, its correct implementation is not straightforward due to the subtleties with interpretation of the false discovery rate (FDR).
 
 This article describes a computational workflow for performing a DB analysis with sliding windows.
 The aim is to facilitate the practical implementation of window-based DB analyses by providing detailed code and expected output.
@@ -147,6 +147,8 @@ for (bam in bam.files) {
 
 Potential PCR duplicates are marked using the `MarkDuplicates` tool from the [Picard software suite](http://broadinstitute.github.io/picard).
 These are identified as alignments at the same genomic location, such that they may have originated from PCR-amplified copies of the same DNA fragment.
+
+
 
 
 ```r
@@ -427,7 +429,7 @@ head(offsets)
 ## [6,] -0.7028331 -0.6463783 0.5390876 0.8101237
 ```
 
-The effect of non-linear normalization can be visualized a mean-difference plot comparing the first and last libraries.
+The effect of non-linear normalization can be visualized with a mean-difference plot comparing the first and last libraries.
 Once the offsets are applied to adjust the log-fold changes, the trend is eliminated from the plot (Figure 4).
 The cloud of points is also centred at a log-fold change of zero.
 This indicates that normalization was successful in removing the differences between libraries. 
@@ -597,7 +599,7 @@ head(res$table)
 One might attempt to control the FDR by applying the Benjamini-Hochberg (BH) method to the window-level *p*-values [@benjamini1995controlling].
 However, the features of interest are not windows, but the genomic regions that they represent.
 Control of the FDR across windows does not guarantee control of the FDR across regions [@lun2014denovo].
-The latter is arguably more relevant for the final intepretation of the results.
+The latter is arguably more relevant for the final interpretation of the results.
 
 Control of the region-level FDR can be provided by aggregating windows into regions and combining the *p*-values.
 Here, adjacent windows less than 100 bp apart are aggregated into clusters.
@@ -863,9 +865,9 @@ The other is the annotation track containing gene models, with gene IDs replaced
 
 ```r
 library(Gviz)
-gax <- GenomeAxisTrack(col="black", fontsize=15)
+gax <- GenomeAxisTrack(col="black", fontsize=15, size=2)
 greg <- GeneRegionTrack(TxDb.Mmusculus.UCSC.mm10.knownGene, showId=TRUE, 
-    geneSymbol=TRUE, name="UCSC genes", col.title="black")
+    geneSymbol=TRUE, name="", background.title="transparent")
 symbols <- unlist(mapIds(org.Mm.eg.db, gene(greg), "SYMBOL", 
     "ENTREZID", multiVals = "first"))
 symbol(greg) <- symbols[gene(greg)]
@@ -930,7 +932,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 ### Complex DB across a broad region
 
-Complex DB refers to situations where multiple DB events are occuring within the same enriched region.
+Complex DB refers to situations where multiple DB events are occurring within the same enriched region.
 These are identified as those clusters that contain windows changing in both directions.
 Here, the second-ranking complex cluster is selected for visualization 
     (the top-ranking complex cluster is adjacent to the region used in the previous example, so another region is chosen for some variety).
@@ -974,7 +976,7 @@ for (i in 1:length(bam.files)) {
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
         name=bam.files[i], col.axis="black", col.title="black",
-    	fill="darkgray", col.histogram=NA)
+        fill="darkgray", col.histogram=NA)
 }
 plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)),
     from=start(cur.region), to=end(cur.region))
@@ -1016,7 +1018,7 @@ cur.region
 
 Marking is increased for mature B cells within a 500 bp region (Figure 10), which is sharper than the changes in the previous two examples.
 This also coincides with the promoter of the *Cd86* gene.
-Again, this makes biological sense as Cd86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
+Again, this makes biological sense as CD86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
 	
 
 ```r
@@ -1026,7 +1028,7 @@ for (i in 1:length(bam.files)) {
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
         name=bam.files[i], col.axis="black", col.title="black",
-	fill="darkgray", col.histogram=NA)
+        fill="darkgray", col.histogram=NA)
 }
 plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)),
     from=start(cur.region), to=end(cur.region))
@@ -1098,6 +1100,8 @@ align(index="index/mm10", readfile1=all.fastq, phredOffset=64,
 
 Alignments in each BAM file are sorted by coordinate.
 Duplicate reads are marked, and the resulting files are indexed.
+
+
 
 
 ```r
@@ -1482,10 +1486,10 @@ sessionInfo()
 ## [18] Rsamtools_1.20.4                        
 ## [19] Biostrings_2.36.4                       
 ## [20] XVector_0.8.0                           
-## [21] GenomicRanges_1.20.5                    
+## [21] GenomicRanges_1.20.6                    
 ## [22] GenomeInfoDb_1.4.2                      
 ## [23] IRanges_2.2.7                           
-## [24] S4Vectors_0.6.3                         
+## [24] S4Vectors_0.6.4                         
 ## [25] BiocGenerics_0.14.0                     
 ## [26] Rsubread_1.18.0                         
 ## [27] knitr_1.11                              
@@ -1502,10 +1506,10 @@ sessionInfo()
 ## [15] splines_3.2.0             BiocParallel_1.2.20      
 ## [17] foreign_0.8-66            stringr_1.0.0            
 ## [19] RCurl_1.95-4.7            munsell_0.4.2            
-## [21] multtest_2.24.0           nnet_7.3-10              
+## [21] multtest_2.24.0           nnet_7.3-11              
 ## [23] gridExtra_2.0.0           Hmisc_3.16-0             
 ## [25] matrixStats_0.14.2        XML_3.98-1.3             
-## [27] GenomicAlignments_1.4.1   MASS_7.3-43              
+## [27] GenomicAlignments_1.4.1   MASS_7.3-44              
 ## [29] bitops_1.0-6              RBGL_1.44.0              
 ## [31] gtable_0.1.2              magrittr_1.5             
 ## [33] formatR_1.2               scales_0.3.0             
@@ -1516,7 +1520,7 @@ sessionInfo()
 ## [43] RColorBrewer_1.1-2        tools_3.2.0              
 ## [45] dichromat_2.0-0           BSgenome_1.36.3          
 ## [47] survival_2.38-3           colorspace_1.2-6         
-## [49] cluster_2.0.3             VariantAnnotation_1.14.11
+## [49] cluster_2.0.3             VariantAnnotation_1.14.13
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
@@ -1537,7 +1541,7 @@ No competing interests were disclosed.
 
 # Grant information
 
-National Health and Medical Research Council (Program Grant 1054618 and Fellowship to G.K.S.);
+National Health and Medical Research Council (Program Grant 1054618 to G.K.S., Fellowship to G.K.S.);
 Victorian State Government Operational Infrastructure Support; Australian Government NHMRC IRIIS.
 
 # Acknowledgements
