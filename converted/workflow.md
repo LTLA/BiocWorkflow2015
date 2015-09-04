@@ -6,16 +6,14 @@ author:
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
 date: 1 September 2015
+vignette: >
+  %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
+  %\VignetteEngine{knitr::rmarkdown}
 output: 
     BiocStyle::html_document:
         fig_caption: yes
 bibliography: ref.bib
 ---
-
-<!--
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{ChIP-seq workflow to detect differential binding}
--->
 
 
 
@@ -1482,14 +1480,14 @@ sessionInfo()
 ## [14] locfit_1.5-9.1                          
 ## [15] statmod_1.4.21                          
 ## [16] csaw_1.2.1                              
-## [17] rtracklayer_1.28.9                      
+## [17] rtracklayer_1.28.10                     
 ## [18] Rsamtools_1.20.4                        
 ## [19] Biostrings_2.36.4                       
 ## [20] XVector_0.8.0                           
 ## [21] GenomicRanges_1.20.6                    
 ## [22] GenomeInfoDb_1.4.2                      
 ## [23] IRanges_2.2.7                           
-## [24] S4Vectors_0.6.4                         
+## [24] S4Vectors_0.6.5                         
 ## [25] BiocGenerics_0.14.0                     
 ## [26] Rsubread_1.18.0                         
 ## [27] knitr_1.11                              
