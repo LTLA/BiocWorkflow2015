@@ -14,6 +14,13 @@ cat temp.Rmd | sed "s/^author:/author: $allauthors\nauthor_affiliation: $allaffi
 
 mv temp2.Rmd temp.Rmd
 
+# We need to add a image size limiter to the HTML right after the YAML
+# block, otherwise the image size on the page depends on its actual size.
+
+cat temp.Rmd | sed -e '2,$s/---/---\n\n\n<style>\npre, img {\n  max-width: 100%;\n  display: block;\n}\n<\/style>\n\n/' > temp2.Rmd
+
+mv temp2.Rmd temp.Rmd
+
 # Moving to the BioC folder, if it isn't there already.
 
 mv temp.Rmd bioC/chipseq_db.Rmd
