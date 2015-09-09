@@ -742,7 +742,7 @@ using a log-transformed FDR as the score.
 
 Saving the `RangedSummarizedExperiment` objects is also recommended.
 This avoids the need to re-run the time-consuming read counting steps if
-parts of the analysis need to be performed. Similarly, the `DGEList`
+parts of the analysis need to be repeated. Similarly, the `DGEList`
 object is saved so that the
 *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)*
 statistics can be easily recovered.
@@ -1240,9 +1240,9 @@ makes it more appropriate for use in the CBP analysis.
 ### Filtering of low-abundance windows
 
 Removal of low-abundance windows is performed as previously described.
-The majority of windows in background regions are removed upon applying
-a modest fold-change threshold. This leaves a small set of relevant
-windows for further analysis.
+The majority of windows in background regions are filtered out upon
+applying a modest fold-change threshold. This leaves a small set of
+relevant windows for further analysis.
 
     filter.stat <- filterWindows(win.data, bins, type="global")
     min.fc <- 3
@@ -1435,7 +1435,7 @@ requires a number of software packages, including
 *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*,
 *[Rsamtools](http://bioconductor.org/packages/release/bioc/html/Rsamtools.html)*,
 *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)*,
-*[Rtracklayer](http://bioconductor.org/packages/release/bioc/html/Rtracklayer.html)*
+*[rtracklayer](http://bioconductor.org/packages/release/bioc/html/rtracklayer.html)*
 and
 *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*.
 It also depends on the annotation packages
@@ -1466,32 +1466,33 @@ Version numbers for all packages used are shown below.
     ##  [1] Gviz_1.12.1                             
     ##  [2] ChIPpeakAnno_3.2.2                      
     ##  [3] biomaRt_2.24.0                          
-    ##  [4] VennDiagram_1.6.9                       
-    ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.1.2
-    ##  [6] GenomicFeatures_1.20.3                  
-    ##  [7] org.Mm.eg.db_3.1.2                      
-    ##  [8] RSQLite_1.0.0                           
-    ##  [9] DBI_0.3.1                               
-    ## [10] AnnotationDbi_1.30.1                    
-    ## [11] Biobase_2.28.0                          
-    ## [12] edgeR_3.10.2                            
-    ## [13] limma_3.24.15                           
-    ## [14] locfit_1.5-9.1                          
-    ## [15] statmod_1.4.21                          
-    ## [16] csaw_1.2.1                              
-    ## [17] rtracklayer_1.28.10                     
-    ## [18] Rsamtools_1.20.4                        
-    ## [19] Biostrings_2.36.4                       
-    ## [20] XVector_0.8.0                           
-    ## [21] GenomicRanges_1.20.6                    
-    ## [22] GenomeInfoDb_1.4.2                      
-    ## [23] IRanges_2.2.7                           
-    ## [24] S4Vectors_0.6.5                         
-    ## [25] BiocGenerics_0.14.0                     
-    ## [26] Rsubread_1.18.0                         
-    ## [27] BiocStyle_1.6.0                         
-    ## [28] rmarkdown_0.8                           
-    ## [29] knitr_1.11                              
+    ##  [4] VennDiagram_1.6.15                      
+    ##  [5] futile.logger_1.4.1                     
+    ##  [6] TxDb.Mmusculus.UCSC.mm10.knownGene_3.1.2
+    ##  [7] GenomicFeatures_1.20.4                  
+    ##  [8] org.Mm.eg.db_3.1.2                      
+    ##  [9] RSQLite_1.0.0                           
+    ## [10] DBI_0.3.1                               
+    ## [11] AnnotationDbi_1.30.1                    
+    ## [12] Biobase_2.28.0                          
+    ## [13] edgeR_3.10.2                            
+    ## [14] limma_3.24.15                           
+    ## [15] locfit_1.5-9.1                          
+    ## [16] statmod_1.4.21                          
+    ## [17] csaw_1.2.1                              
+    ## [18] rtracklayer_1.28.10                     
+    ## [19] Rsamtools_1.20.4                        
+    ## [20] Biostrings_2.36.4                       
+    ## [21] XVector_0.8.0                           
+    ## [22] GenomicRanges_1.20.6                    
+    ## [23] GenomeInfoDb_1.4.2                      
+    ## [24] IRanges_2.2.7                           
+    ## [25] S4Vectors_0.6.5                         
+    ## [26] BiocGenerics_0.14.0                     
+    ## [27] Rsubread_1.18.0                         
+    ## [28] BiocStyle_1.6.0                         
+    ## [29] rmarkdown_0.8                           
+    ## [30] knitr_1.11                              
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] Rcpp_0.12.0               biovizBase_1.16.0        
@@ -1501,7 +1502,7 @@ Version numbers for all packages used are shown below.
     ##  [9] evaluate_0.7.2            ggplot2_1.0.1            
     ## [11] BiocInstaller_1.18.4      zlibbioc_1.14.0          
     ## [13] rpart_4.1-9               proto_0.3-10             
-    ## [15] splines_3.2.1             BiocParallel_1.2.20      
+    ## [15] splines_3.2.1             BiocParallel_1.2.21      
     ## [17] foreign_0.8-63            stringr_1.0.0            
     ## [19] RCurl_1.95-4.7            munsell_0.4.2            
     ## [21] multtest_2.24.0           htmltools_0.2.6          
@@ -1514,12 +1515,12 @@ Version numbers for all packages used are shown below.
     ## [35] scales_0.3.0              graph_1.46.0             
     ## [37] KernSmooth_2.23-14        stringi_0.5-5            
     ## [39] reshape2_1.4.1            latticeExtra_0.6-26      
-    ## [41] futile.logger_1.4.1       Formula_1.2-1            
-    ## [43] lambda.r_1.1.7            RColorBrewer_1.1-2       
-    ## [45] tools_3.2.1               dichromat_2.0-0          
-    ## [47] BSgenome_1.36.3           survival_2.38-1          
-    ## [49] yaml_2.1.13               colorspace_1.2-6         
-    ## [51] cluster_2.0.1             VariantAnnotation_1.14.13
+    ## [41] Formula_1.2-1             lambda.r_1.1.7           
+    ## [43] RColorBrewer_1.1-2        tools_3.2.1              
+    ## [45] dichromat_2.0-0           BSgenome_1.36.3          
+    ## [47] survival_2.38-1           yaml_2.1.13              
+    ## [49] colorspace_1.2-6          cluster_2.0.1            
+    ## [51] VariantAnnotation_1.14.13
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2)
 from the SRA Toolkit must be installed on the system, along with the
