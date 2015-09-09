@@ -40,7 +40,7 @@ exit 0
 # This is necessary in order for BioC's build system to access the files,
 # as we can't unpack and align from the SRA files themselves.
 
-cd markdown
+cd ${refdir}/markdown
 for x in `ls | egrep "\.(bam|bai)$"`
 do
     echo $x
