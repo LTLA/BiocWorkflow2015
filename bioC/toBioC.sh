@@ -2,7 +2,8 @@
 # to TRUE, to avoid the alignment steps that BioC can't do (as the command line 
 # utilities aren't available). Instead, they're starting from the BAM files.
 
-cat markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" > temp.Rmd
+refdir='..'
+cat ${refdir}/markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" > temp.Rmd
 
 # We also need to reformat the author listing and affiliations, because BioC's
 # rendering system assumes that the author YAML field is a simple string.
@@ -30,8 +31,8 @@ mv temp2.Rmd temp.Rmd
 
 # Moving to the BioC folder, if it isn't there already.
 
-mv temp.Rmd bioC/chipseq_db.Rmd
-cp converted/ref.bib bioC
+mv temp.Rmd ${refdir}/bioC/markdown/chipseq_db.Rmd
+cp ${refdir}/converted/ref.bib ${refdir}/bioC/markdown 
 
 exit 0
 
@@ -39,12 +40,13 @@ exit 0
 # This is necessary in order for BioC's build system to access the files,
 # as we can't unpack and align from the SRA files themselves.
 
-for x in `ls markdown/* | egrep "\.(bam|bai)$"`
+cd markdown
+for x in `ls | egrep "\.(bam|bai)$"`
 do
     echo $x
     aws s3 cp $x s3://chipseqdb-bamfiles --acl public-read 
 done
 
-aws s3 cp markdown/mm9-blacklist.bed s3://chipseqdb-bamfiles --acl public-read 
-aws s3 cp markdown/mm9ToMm10.over.chain s3://chipseqdb-bamfiles --acl public-read 
+aws s3 cp mm9-blacklist.bed s3://chipseqdb-bamfiles --acl public-read 
+aws s3 cp mm9ToMm10.over.chain s3://chipseqdb-bamfiles --acl public-read 
 
