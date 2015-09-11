@@ -452,7 +452,7 @@ The high-abundance tail at zero (before normalization) probably represents micro
 They still exhibit biases consistent with background regions, which is why they lie so close to zero.
 There's not much helping this unless they get removed at the start.
 -->
-     
+
 ## Statistical modelling of biological variability 
 
 ### Introduction
@@ -720,7 +720,7 @@ export(con="h3k9ac_results.bed", object=simplified)
 ```
 
 Saving the `RangedSummarizedExperiment` objects is also recommended.
-This avoids the need to re-run the time-consuming read counting steps if parts of the analysis need to be performed.
+This avoids the need to re-run the time-consuming read counting steps if parts of the analysis need to be repeated.
 Similarly, the `DGEList` object is saved so that the *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)* statistics can be easily recovered.
 
 
@@ -1232,7 +1232,7 @@ No such assumption is made by the binned-TMM approach described above, which mak
 ### Filtering of low-abundance windows
 
 Removal of low-abundance windows is performed as previously described.
-The majority of windows in background regions are removed upon applying a modest fold-change threshold.
+The majority of windows in background regions are filtered out upon applying a modest fold-change threshold.
 This leaves a small set of relevant windows for further analysis.
 
 
@@ -1437,7 +1437,7 @@ Readers are encouraged to apply the concepts and code presented in this article 
 # Software availability
 
 This workflow depends on various packages from version 3.1 of the Bioconductor project, running on *R* version 3.2.0 or higher.
-It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)*, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*, *[Rsamtools](http://bioconductor.org/packages/release/bioc/html/Rsamtools.html)*, *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)*, *[Rtracklayer](http://bioconductor.org/packages/release/bioc/html/Rtracklayer.html)* and *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*.
+It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)*, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*, *[Rsamtools](http://bioconductor.org/packages/release/bioc/html/Rsamtools.html)*, *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)*, *[rtracklayer](http://bioconductor.org/packages/release/bioc/html/rtracklayer.html)* and *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*.
 It also depends on the annotation packages *[org.Mm.eg.db](http://bioconductor.org/packages/release/data/annotation/html/org.Mm.eg.db.html)* and *[TxDb.Mmusculus.UCSC.mm10.knownGene](http://bioconductor.org/packages/release/data/annotation/html/TxDb.Mmusculus.UCSC.mm10.knownGene.html)*.
 Version numbers for all packages used are shown below.
 
@@ -1469,7 +1469,7 @@ sessionInfo()
 ##  [3] biomaRt_2.24.0                          
 ##  [4] VennDiagram_1.6.9                       
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.1.2
-##  [6] GenomicFeatures_1.20.3                  
+##  [6] GenomicFeatures_1.20.4                  
 ##  [7] org.Mm.eg.db_3.1.2                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
@@ -1501,7 +1501,7 @@ sessionInfo()
 ##  [9] evaluate_0.7.2            ggplot2_1.0.1            
 ## [11] BiocInstaller_1.18.4      zlibbioc_1.14.0          
 ## [13] rpart_4.1-10              proto_0.3-10             
-## [15] splines_3.2.0             BiocParallel_1.2.20      
+## [15] splines_3.2.0             BiocParallel_1.2.21      
 ## [17] foreign_0.8-66            stringr_1.0.0            
 ## [19] RCurl_1.95-4.7            munsell_0.4.2            
 ## [21] multtest_2.24.0           nnet_7.3-11              
