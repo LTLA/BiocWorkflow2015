@@ -121,12 +121,13 @@ group.fastq <- paste0(names(by.group), ".fastq")
 Reads in each library are aligned to the mm10 build of the mouse genome, using the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
 This assumes that an index has already been constructed with the prefix `index/mm10`.
 Here, a consensus threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32 bp).
+The `type` parameter is also set to optimize for genomic alignment, rather than alignment to the transcriptome.
 
 
 ```r
 library(Rsubread)
 bam.files <- paste0(names(by.group), ".bam")
-align(index="index/mm10", readfile1=group.fastq, TH1=2, 
+align(index="index/mm10", readfile1=group.fastq, TH1=2, type=1,
     input_format="FASTQ", output_file=bam.files)
 ```
 
@@ -166,6 +167,8 @@ for (bam in bam.files) {
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+
+
 
 
 
@@ -1092,7 +1095,7 @@ A Phred offset of +64 is also used, instead of the default +33 used in the previ
 
 ```r
 bam.files <- paste0(sra.numbers, ".bam")
-align(index="index/mm10", readfile1=all.fastq, phredOffset=64, 
+align(index="index/mm10", readfile1=all.fastq, type=1, phredOffset=64, 
     input_format="FASTQ", output_file=bam.files)
 ```
 
@@ -1124,6 +1127,8 @@ indexBam(bam.files)
 
 Some mapping statistics can be reported as previously described.
 For brevity, the code will not be shown here, as it is identical to that used for the H3K9ac analysis.
+
+
 
 
 
@@ -1496,7 +1501,7 @@ sessionInfo()
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] httr_1.0.0                   regioneR_1.2.0              
-##  [3] AnnotationHub_2.2.0          splines_3.2.2               
+##  [3] AnnotationHub_2.2.1          splines_3.2.2               
 ##  [5] Formula_1.2-1                shiny_0.12.2                
 ##  [7] interactiveDisplayBase_1.8.0 latticeExtra_0.6-26         
 ##  [9] RBGL_1.46.0                  BSgenome_1.38.0             
@@ -1507,7 +1512,7 @@ sessionInfo()
 ## [19] XML_3.98-1.3                 biomaRt_2.26.0              
 ## [21] zlibbioc_1.16.0              xtable_1.7-4                
 ## [23] GO.db_3.2.2                  scales_0.3.0                
-## [25] BiocParallel_1.3.54          ggplot2_1.0.1               
+## [25] BiocParallel_1.4.0           ggplot2_1.0.1               
 ## [27] nnet_7.3-11                  proto_0.3-10                
 ## [29] survival_2.38-3              magrittr_1.5                
 ## [31] mime_0.4                     memoise_0.2.1               
