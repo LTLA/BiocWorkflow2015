@@ -22,6 +22,7 @@ opts_chunk$set(error=FALSE)
 opts_chunk$set(fig.width=7, fig.height=7)
 opts_chunk$set(dpi=300, dev="png", dev.args=list(pointsize=15))
 biocbuild <- TRUE # BioC build starts from BAM files, not SRA.
+keep.files <- TRUE & biocbuild # Keeping files to avoid redownloading them.
 ```
 
 # Introduction
@@ -167,6 +168,9 @@ library(Rsubread)
 library(Rsamtools)
 by.group <- split(all.sra, grouping)
 bam.files <- paste0(names(by.group), ".bam")
+```
+
+```{r, eval=!keep.files, results="hide", echo=FALSE, message=FALSE}
 core.loc <- "http://s3.amazonaws.com/chipseqdb-bamfiles/"
 for (bam in bam.files) { # Downloading all files.
     bam.url <- paste0(core.loc, bam)
@@ -226,7 +230,7 @@ The chain file specifies the corresponding coordinates between the two builds an
     [here](http://hgdownload-test.cse.ucsc.edu/goldenPath/mm9/liftOver/mm9ToMm10.over.chain.gz).
 The new blacklist coordinates are then saved to file for future use.
 
-```{r, eval=biocbuild, message=FALSE, echo=FALSE, results="hide"}
+```{r, eval=!keep.files, message=FALSE, echo=FALSE, results="hide"}
 chain.file <- "mm9ToMm10.over.chain"
 download.file(paste0(core.loc, chain.file), chain.file)
 bed.file <- "mm9-blacklist.bed"
@@ -899,6 +903,9 @@ For brevity, the code will not be shown here, as it is identical to that used fo
 
 ```{r, echo=FALSE, results="hide", eval=biocbuild, message=FALSE}
 bam.files <- paste0(sra.numbers, ".bam")
+```
+
+```{r, echo=FALSE, results="hide", eval=!keep.files, message=FALSE}
 for (bam in bam.files) {
     bam.url <- paste0(core.loc, bam)
     download.file(bam.url, bam)
