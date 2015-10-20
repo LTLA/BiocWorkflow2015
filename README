@@ -24,11 +24,11 @@ cd -
 
 # Currently, alignment is turned off to ensure we get the same results upon re-analysis
 # (as Rsubread changes quite regularly, and I don't won't to have to keep on checking it). 
-# However, we still need to check that the code is correct. To do that, we run it with i
-# alignment turned back on (i.e. biocbuild turned off).
+# However, we still need to check that the code is correct. To do that, we run it with
+# alignment turned back on.
 
 cd aligntest
-cat ../markdown/workflow.Rmd | sed "s/biocbuild <- TRUE/biocbuild <- FALSE/" > workflow.Rmd
+cat ../markdown/workflow.Rmd | sed "s/remap <- FALSE/remap <- TRUE/" > workflow.Rmd
 Rscript compile.R workflow
 cd -
 

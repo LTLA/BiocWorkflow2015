@@ -5,7 +5,7 @@
 # order to tell the build system to re-download the files.
 
 refdir='..'
-cat ${refdir}/markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" | sed "s/keep.files <- TRUE/keep.files <- FALSE/" > temp.Rmd
+cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | sed "s/keep.files <- TRUE/keep.files <- FALSE/" > temp.Rmd
 
 # We also need to reformat the author listing and affiliations, because BioC's
 # rendering system assumes that the author YAML field is a simple string.
