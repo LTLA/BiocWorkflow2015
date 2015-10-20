@@ -349,9 +349,9 @@ represents a library.
     win.data <- windowCounts(bam.files, param=param, width=150, ext=frag.len)
     win.data
 
-    ## class: SummarizedExperiment 
+    ## class: RangedSummarizedExperiment 
     ## dim: 1569624 4 
-    ## exptData(4): spacing width shift final.ext
+    ## metadata(4): spacing width shift final.ext
     ## assays(1): counts
     ## rownames: NULL
     ## rowRanges metadata column names(0):
@@ -442,7 +442,7 @@ implements a version of the fast loess method (Ballman et al. 2004) that
 is adapted to count data. This produces a matrix of offsets that can be
 used during GLM fitting.
 
-    offsets <- normalize(filtered.data, type="loess")
+    offsets <- normOffsets(filtered.data, type="loess")
     head(offsets)
 
     ##            [,1]       [,2]      [,3]      [,4]
@@ -851,12 +851,12 @@ that have no overlapping windows).
     head(data.frame(Gene=promoters$symbol, tabprom)[!is.na(tabprom$PValue),])
 
     ##       Gene nWindows logFC.up logFC.down         PValue          FDR
-    ## 6  Ldlrap1       19       11          0 0.224741404877 0.2705479855
-    ## 7     Mdn1       29       12         11 0.000004447727 0.0001347924
-    ## 8    Pydc3        8        0          6 0.051183399851 0.0781822366
-    ## 9   Wfdc17        6        0          6 0.000069604922 0.0008738790
-    ## 10  Mfap1b       19        1         10 0.107116609335 0.1440819313
-    ## 13 Gm15772       30       12          7 0.085543435687 0.1192823092
+    ## 6  Ldlrap1       19       11          0 0.224741404877 0.2707231899
+    ## 7     Mdn1       29       12         11 0.000004447727 0.0001346831
+    ## 8    Pydc3        8        0          6 0.051183399851 0.0781862855
+    ## 9   Wfdc17        6        0          6 0.000069604922 0.0008739367
+    ## 10  Mfap1b       19        1         10 0.107116609335 0.1441133306
+    ## 13 Gm15772       30       12          7 0.085543435687 0.1193045223
 
 Note that this is distinct from counting reads across promoters. Using
 promoter-level counts would not provide enough spatial resolution to
@@ -1171,9 +1171,9 @@ regions. In this case, a window size of 10 bp is used.
     win.data <- windowCounts(bam.files, param=param, width=10, ext=frag.len)
     win.data
 
-    ## class: SummarizedExperiment 
+    ## class: RangedSummarizedExperiment 
     ## dim: 9127613 4 
-    ## exptData(4): spacing width shift final.ext
+    ## metadata(4): spacing width shift final.ext
     ## assays(1): counts
     ## rownames: NULL
     ## rowRanges metadata column names(0):
@@ -1196,7 +1196,7 @@ compute normalization factors from the bin counts. These factors can
 then be applied to the DB analysis with the window counts.
 
     bins <- windowCounts(bam.files, bin=TRUE, width=10000, param=param)
-    normfacs <- normalize(bins)
+    normfacs <- normOffsets(bins)
     normfacs
 
     ## [1] 1.011851 0.908138 1.044806 1.041588
@@ -1446,8 +1446,8 @@ Version numbers for all packages used are shown below.
 
     sessionInfo()
 
-    ## R version 3.2.1 (2015-06-18)
-    ## Platform: x86_64-unknown-linux-gnu (64-bit)
+    ## R version 3.2.2 (2015-08-14)
+    ## Platform: x86_64-pc-linux-gnu (64-bit)
     ## Running under: Ubuntu precise (12.04.4 LTS)
     ## 
     ## locale:
@@ -1463,64 +1463,70 @@ Version numbers for all packages used are shown below.
     ##  [8] datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] Gviz_1.12.1                             
-    ##  [2] ChIPpeakAnno_3.2.2                      
-    ##  [3] biomaRt_2.24.0                          
-    ##  [4] VennDiagram_1.6.15                      
-    ##  [5] futile.logger_1.4.1                     
-    ##  [6] TxDb.Mmusculus.UCSC.mm10.knownGene_3.1.2
-    ##  [7] GenomicFeatures_1.20.4                  
-    ##  [8] org.Mm.eg.db_3.1.2                      
-    ##  [9] RSQLite_1.0.0                           
-    ## [10] DBI_0.3.1                               
-    ## [11] AnnotationDbi_1.30.1                    
-    ## [12] Biobase_2.28.0                          
-    ## [13] edgeR_3.10.2                            
-    ## [14] limma_3.24.15                           
-    ## [15] locfit_1.5-9.1                          
-    ## [16] statmod_1.4.21                          
-    ## [17] csaw_1.2.1                              
-    ## [18] rtracklayer_1.28.10                     
-    ## [19] Rsamtools_1.20.4                        
-    ## [20] Biostrings_2.36.4                       
-    ## [21] XVector_0.8.0                           
-    ## [22] GenomicRanges_1.20.6                    
-    ## [23] GenomeInfoDb_1.4.2                      
-    ## [24] IRanges_2.2.7                           
-    ## [25] S4Vectors_0.6.5                         
-    ## [26] BiocGenerics_0.14.0                     
-    ## [27] Rsubread_1.18.0                         
-    ## [28] BiocStyle_1.6.0                         
-    ## [29] rmarkdown_0.8                           
+    ##  [1] Gviz_1.14.0                             
+    ##  [2] ChIPpeakAnno_3.4.0                      
+    ##  [3] VennDiagram_1.6.16                      
+    ##  [4] futile.logger_1.4.1                     
+    ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
+    ##  [6] GenomicFeatures_1.22.0                  
+    ##  [7] org.Mm.eg.db_3.2.3                      
+    ##  [8] RSQLite_1.0.0                           
+    ##  [9] DBI_0.3.1                               
+    ## [10] AnnotationDbi_1.32.0                    
+    ## [11] edgeR_3.12.0                            
+    ## [12] limma_3.26.0                            
+    ## [13] locfit_1.5-9.1                          
+    ## [14] statmod_1.4.21                          
+    ## [15] csaw_1.4.0                              
+    ## [16] SummarizedExperiment_1.0.0              
+    ## [17] Biobase_2.30.0                          
+    ## [18] rtracklayer_1.30.0                      
+    ## [19] Rsamtools_1.22.0                        
+    ## [20] Biostrings_2.38.0                       
+    ## [21] XVector_0.10.0                          
+    ## [22] GenomicRanges_1.22.0                    
+    ## [23] GenomeInfoDb_1.6.0                      
+    ## [24] IRanges_2.4.0                           
+    ## [25] S4Vectors_0.8.0                         
+    ## [26] BiocGenerics_0.16.0                     
+    ## [27] Rsubread_1.20.0                         
+    ## [28] BiocStyle_1.8.0                         
+    ## [29] rmarkdown_0.8.1                         
     ## [30] knitr_1.11                              
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_0.12.0               biovizBase_1.16.0        
-    ##  [3] lattice_0.20-33           GO.db_3.1.2              
-    ##  [5] digest_0.6.8              plyr_1.8.3               
-    ##  [7] acepack_1.3-3.3           futile.options_1.0.0     
-    ##  [9] evaluate_0.7.2            ggplot2_1.0.1            
-    ## [11] BiocInstaller_1.18.4      zlibbioc_1.14.0          
-    ## [13] rpart_4.1-9               proto_0.3-10             
-    ## [15] splines_3.2.1             BiocParallel_1.2.21      
-    ## [17] foreign_0.8-63            stringr_1.0.0            
-    ## [19] RCurl_1.95-4.7            munsell_0.4.2            
-    ## [21] multtest_2.24.0           htmltools_0.2.6          
-    ## [23] nnet_7.3-9                gridExtra_2.0.0          
-    ## [25] Hmisc_3.16-0              matrixStats_0.14.2       
-    ## [27] XML_3.98-1.3              GenomicAlignments_1.4.1  
-    ## [29] MASS_7.3-40               bitops_1.0-6             
-    ## [31] RBGL_1.44.0               gtable_0.1.2             
-    ## [33] magrittr_1.5              formatR_1.2              
-    ## [35] scales_0.3.0              graph_1.46.0             
-    ## [37] KernSmooth_2.23-14        stringi_0.5-5            
-    ## [39] reshape2_1.4.1            latticeExtra_0.6-26      
-    ## [41] Formula_1.2-1             lambda.r_1.1.7           
-    ## [43] RColorBrewer_1.1-2        tools_3.2.1              
-    ## [45] dichromat_2.0-0           BSgenome_1.36.3          
-    ## [47] survival_2.38-1           yaml_2.1.13              
-    ## [49] colorspace_1.2-6          cluster_2.0.1            
-    ## [51] VariantAnnotation_1.14.13
+    ##  [1] bitops_1.0-6                 matrixStats_0.14.2          
+    ##  [3] RColorBrewer_1.1-2           httr_1.0.0                  
+    ##  [5] tools_3.2.2                  R6_2.1.1                    
+    ##  [7] rpart_4.1-10                 KernSmooth_2.23-15          
+    ##  [9] Hmisc_3.17-0                 colorspace_1.2-6            
+    ## [11] nnet_7.3-10                  gridExtra_2.0.0             
+    ## [13] graph_1.48.0                 formatR_1.2.1               
+    ## [15] scales_0.3.0                 RBGL_1.46.0                 
+    ## [17] stringr_1.0.0                digest_0.6.8                
+    ## [19] foreign_0.8-65               dichromat_2.0-0             
+    ## [21] htmltools_0.2.6              ensembldb_1.2.0             
+    ## [23] BSgenome_1.38.0              regioneR_1.2.0              
+    ## [25] BiocInstaller_1.20.0         shiny_0.12.2                
+    ## [27] BiocParallel_1.4.0           acepack_1.3-3.3             
+    ## [29] VariantAnnotation_1.16.0     RCurl_1.95-4.7              
+    ## [31] magrittr_1.5                 GO.db_3.2.2                 
+    ## [33] Formula_1.2-1                Rcpp_0.12.1                 
+    ## [35] munsell_0.4.2                proto_0.3-10                
+    ## [37] stringi_0.5-5                yaml_2.1.13                 
+    ## [39] MASS_7.3-43                  zlibbioc_1.16.0             
+    ## [41] plyr_1.8.3                   AnnotationHub_2.2.1         
+    ## [43] lattice_0.20-33              splines_3.2.2               
+    ## [45] multtest_2.26.0              reshape2_1.4.1              
+    ## [47] biomaRt_2.26.0               futile.options_1.0.0        
+    ## [49] XML_3.98-1.3                 evaluate_0.8                
+    ## [51] biovizBase_1.18.0            latticeExtra_0.6-26         
+    ## [53] lambda.r_1.1.7               httpuv_1.3.3                
+    ## [55] gtable_0.1.2                 ggplot2_1.0.1               
+    ## [57] mime_0.4                     xtable_1.7-4                
+    ## [59] survival_2.38-3              GenomicAlignments_1.6.0     
+    ## [61] memoise_0.2.1                cluster_2.0.3               
+    ## [63] interactiveDisplayBase_1.8.0
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2)
 from the SRA Toolkit must be installed on the system, along with the
