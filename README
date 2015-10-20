@@ -22,6 +22,17 @@ cd markdown
 Rscript compile.R workflow
 cd -
 
+# Currently, alignment is turned off to ensure we get the same results upon re-analysis
+# (as Rsubread changes quite regularly, and I don't won't to have to keep on checking it). 
+# However, we still need to check that the code is correct. To do that, we run it with i
+# alignment turned back on (i.e. biocbuild turned off).
+
+cd aligntest
+cat ../markdown/workflow.Rmd | sed "s/biocbuild <- TRUE/biocbuild <- FALSE/" > workflow.Rmd
+Rscript compile.R workflow
+cd -
+
+
 # The next step is to convert the markdown into a format of choice. Here, we convert
 # it to HTML using render(), but it's also possible to convert to TeX via pandoc. This
 # is done using the 'toTex' script, which adds the necessary preamble for F1000Research.
