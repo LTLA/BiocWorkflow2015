@@ -1,9 +1,11 @@
-# BioC's build system is more restrictive. We need to flip the 'biocbuild' flag 
-# to TRUE, to avoid the alignment steps that BioC can't do (as the command line 
-# utilities aren't available). Instead, they're starting from the BAM files.
+# BioC's build system is more restrictive. We need to ensure that the
+# 'biocbuild' flag is set to TRUE, to avoid the alignment steps that BioC can't
+# do (as the command line utilities aren't available). Instead, they're
+# starting from the BAM files. We also need to set keep.file to FALSE, in 
+# order to tell the build system to re-download the files.
 
 refdir='..'
-cat ${refdir}/markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" > temp.Rmd
+cat ${refdir}/markdown/workflow.Rmd | sed "s/biocbuild <- FALSE/biocbuild <- TRUE/" | sed "s/keep.files <- TRUE/keep.files <- FALSE/" > temp.Rmd
 
 # We also need to reformat the author listing and affiliations, because BioC's
 # rendering system assumes that the author YAML field is a simple string.
