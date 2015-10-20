@@ -820,7 +820,7 @@ Optimal detection of all features can be obtained by performing analyses with mu
 In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
 For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
 
-```{r, eval=biocbuild, echo=FALSE, results="hide"}
+```{r, eval=!keep.files, echo=FALSE, results="hide"}
 unlink(bam.files)
 unlink(paste0(bam.files, ".bai"))
 ```
@@ -1111,7 +1111,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
 
-```{r, eval=biocbuild, echo=FALSE, results="hide"}
+```{r, eval=!keep.files, echo=FALSE, results="hide"}
 unlink(bam.files)
 unlink(paste0(bam.files, ".bai"))
 ```
