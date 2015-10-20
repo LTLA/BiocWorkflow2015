@@ -112,11 +112,12 @@ group.fastq <- paste0(names(by.group), ".fastq")
 Reads in each library are aligned to the mm10 build of the mouse genome, using the `r Biocpkg("Rsubread")` package [@liao2013subread].
 This assumes that an index has already been constructed with the prefix `index/mm10`.
 Here, a consensus threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32 bp).
+The `type` parameter is also set to optimize for genomic alignment, rather than alignment to the transcriptome.
 
 ```{r, results="hide", eval=!biocbuild, message=FALSE}
 library(Rsubread)
 bam.files <- paste0(names(by.group), ".bam")
-align(index="index/mm10", readfile1=group.fastq, TH1=2, 
+align(index="index/mm10", readfile1=group.fastq, TH1=2, type=1,
     input_format="FASTQ", output_file=bam.files)
 ```
 
@@ -858,7 +859,7 @@ A Phred offset of +64 is also used, instead of the default +33 used in the previ
 
 ```{r, eval=!biocbuild, message=FALSE, results="hide"}
 bam.files <- paste0(sra.numbers, ".bam")
-align(index="index/mm10", readfile1=all.fastq, phredOffset=64, 
+align(index="index/mm10", readfile1=all.fastq, type=1, phredOffset=64, 
     input_format="FASTQ", output_file=bam.files)
 ```
 
