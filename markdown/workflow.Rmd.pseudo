@@ -399,7 +399,8 @@ smoothScatter(win.ab, norm.fc, ylim=c(-6, 6), xlim=c(0, 5),
 The implicit assumption of non-linear methods is that most windows at each abundance are not DB.
 Any systematic difference between libraries is attributed to bias and is removed.
 This is not appropriate in situations where large-scale DB is expected, as removal of the difference would result in loss of genuine DB.
-However, there is no indication that such changes are present in this data set, so non-linear methods can be applied without too much concern.
+However, there is no indication that such changes are present in this data set, especially given that the cell types being compared are quite closely related.
+This suggests that non-linear normalization can be applied without too much concern.
 
 <!-- 
 The high-abundance tail at zero (before normalization) probably represents microsatellites that have been amplified up.
