@@ -1,3 +1,51 @@
+-   Introduction
+-   Aligning reads in the H3K9ac libraries
+-   Obtaining the ENCODE blacklist for mm10
+-   Testing for DB between pro-B and mature B cells
+    -   Setting up the analysis parameters
+    -   Computing the average fragment length
+    -   Counting reads into windows
+    -   Filtering windows by abundance
+    -   Normalizing for library-specific trended biases
+    -   Statistical modelling of biological variability
+        -   Introduction
+        -   Estimating the NB dispersion
+        -   Estimating the QL dispersion
+        -   Examining the data with MDS plots
+    -   Testing for DB and controlling the FDR
+        -   Testing for DB with QL F-tests
+        -   Controlling the FDR across regions
+        -   Examining the scope and direction of DB
+    -   Saving results to file
+-   Interpreting the DB results
+    -   Adding gene-centric annotation
+        -   Using the `detailRanges` function
+        -   Using the
+            *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*
+            package.
+        -   Reporting gene-based results
+    -   Visualizing DB results
+        -   Overview
+        -   Simple DB across a broad region
+        -   Complex DB across a broad region
+        -   Simple DB across a small region
+-   Repeating the analysis for the CBP data
+    -   Overview
+    -   Aligning reads from CBP libraries
+    -   Detecting DB between genotypes for CBP
+        -   Counting reads into windows
+        -   Normalization for composition biases
+        -   Filtering of low-abundance windows
+        -   Statistical modelling of biological variability
+        -   Testing for DB
+    -   Annotation and visualization
+-   Summary
+-   Software availability
+-   Author contributions
+-   Competing interests
+-   Grant information
+-   Acknowledgements
+
 <style>
 pre, img {
   max-width: 100%;
@@ -147,11 +195,13 @@ using the
 package (Liao, Smyth, and Shi 2013). This assumes that an index has
 already been constructed with the prefix `index/mm10`. Here, a consensus
 threshold of 2 is used instead of the default of 3, to accommodate the
-shorter length of the reads (32 bp).
+shorter length of the reads (32 bp). The `type` parameter is also set to
+optimize for genomic alignment, rather than alignment to the
+transcriptome.
 
     library(Rsubread)
     bam.files <- paste0(names(by.group), ".bam")
-    align(index="index/mm10", readfile1=group.fastq, TH1=2, 
+    align(index="index/mm10", readfile1=group.fastq, TH1=2, type=1,
         input_format="FASTQ", output_file=bam.files)
 
 In each of the resulting BAM files, alignments are re-sorted by their
@@ -1115,7 +1165,7 @@ Here, the default consensus threshold is used as the reads are longer
 used in the previous analysis.
 
     bam.files <- paste0(sra.numbers, ".bam")
-    align(index="index/mm10", readfile1=all.fastq, phredOffset=64, 
+    align(index="index/mm10", readfile1=all.fastq, type=1, phredOffset=64, 
         input_format="FASTQ", output_file=bam.files)
 
 Alignments in each BAM file are sorted by coordinate. Duplicate reads
