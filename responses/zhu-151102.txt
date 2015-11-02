@@ -1,0 +1,90 @@
+> We believe that this well-written paper will greatly help users to apply the 
+> workflow to their own DB analysis of ChIP-seq data sets.
+
+Thanks Julie.
+
+> In the following section, please explicitly explain that the two data sets 
+> were chosen to represent two common ChIP-seq use cases, one data set for 
+> dealing with wider peaks while the other data set is for working with sharp 
+> peaks
+
+Done.
+
+> Therefore, please set type to 1 in the following section.
+
+Done. We note that, at the time of publication, the workflow was constructed using packages in BioC 3.1, at which time the "type" parameter was not available in Rsubread. This has now been changed, along with minor code updates to various other parts of the workflow for BioC 3.2.
+
+> Suggest adding file.exists check to see if temp.dir exists already before 
+> dir.create(temp.dir).
+
+There's no need for the extra check. By default, dir.create() gives a warning if the directory already exists.  We want users to be able to run the code multiple times if they wish, overwriting earlier files if they exist.
+
+> For system call to fastq-dump and MarkDuplicates, suggest to add path 
+> information to these programs in case the path to these programs are not in 
+> the search path.
+
+We believe that implementing this suggestion may be counter-productive for most readers; the absolute path to these programs on our machines will not be useful to the general audience, given that the installation directory will change on different machines. It is the user's responsibility to make sure that these system commands are available prior to analysis - how this is done is largely irrelevant to successful execution of the workflow. The Picard software suite and the SRA Toolkit are quite widely used, so we do not think that installation and access would pose a major problem for most users.
+
+> To prevent readers from getting the idea that 50 is the recommended cutoff, 
+> could you please also provide a quality score threshold commonly used in the 
+> field?
+
+We use 50 for the first data set as the reads are very short (< 40 bp) such that strict filtering is required to avoid mapping errors, non-uniquely-mapped reads, etc. We use the same value for the second data set for consistency, though we concede that a lower value could be used in practice. We have added a comment regarding this to the workflow.
+
+We also note that the MAPQ values reported by (R)subread tend to be quite binary for long reads, i.e., either very low or very high. For example, in SRR1145790, there are 24212282 reads with a MAPQ score >= 50, and 24907156 with a MAPQ score >= 10. This equates to a (relatively minor) 3% increase in available reads from a large change in the MAPQ threshold. All in all, we believe that analyses based on Rsubread alignments are generally robust to the choice of threshold.
+
+> When calculating fold enrichment over background, is the bg coverage scaled 
+> down using the ratio of the window size (2000 vs. 150)?
+
+Yes. This is done automatically within the "filterWindows" function. We have added a note to the workflow to point this out.
+
+> Could you please suggest a normalization method for situations where 
+> large-scale DB is expected (perhaps TMM as mentioned in the later section)?
+
+As you have noted, this issue is addressed more comprehensively in the analysis for the CBP data set. We have added a comment here regarding the existence of alternative normalization strategies when large-scale DB is expected.
+
+> Could you please comment on how common and tag wise values help with 
+> diagnosis of the data set?
+
+The common BCV provides a measure of the overall variability of the data set, averaged across all windows. The tagwise BCVs should be dispersed around the fitted trend to indicate that the fit was successful. These comments have been added to the workflow.
+
+> How about controlling this by allowing nearby windows to merge only if the 
+> changing directions are the same?
+
+This possibility has not escaped us. However, the sign of the log-FC is not independent of the DB status of each window in this particular application. In fact, clustering windows based on the signs of the log-FCs will result in loss of detection power for DB events.
+
+To illustrate, consider a non-DB site with a number of overlapping windows. Due to stochasticity, the log-FCs of those windows fluctuate around zero. Now, assume that we only allow merging of adjacent windows where the signs of the log-FCs are identical. For our non-DB site, we end up with lots of small clusters, comprised of windows with positive or negative log-FCs due to chance. In contrast, for a genuinely DB site, all windows will have positive (or negative) log-FCs, as stochasticity will not change the sign of the log-FC.
+
+When this behaviour is considered on a genome-wide level, we can see that non-DB sites will generate several non-DB clusters, while DB sites will only generate one DB cluster. This results in an increase in the number of tests with large p-values, increasing the severity of the BH correction without any increase in the number of potential discoveries. Ultimately, this results in the loss of detection power for DB events. One might be tempted to overcome this by filtering out small non-DB clusters, but this will compromise FDR control and result in liberalness.
+
+We consider loss of power to be more problematic than the existence of complex DB events. The former means that you don't detect anything, whereas the latter just requires some more consideration during interpretation. In fact, proper identification of complex events is not irrelevant - the context of a change in binding will affect its interpretation (e.g., if it occurs adjacent to an opposing change in the same general region) and this would be lost if changes were reported separately.
+
+Of course, these theoretical issues are beyond the scope of this workflow article. However, considerations of proper FDR control across regions have been discussed in our methodological articles (Lun and Smyth, NAR 2014; Lun and Smyth, NAR 2015).
+
+> Actually, ChIPpeakAnno can also report all overlapping and flanking genes by 
+> setting output="both" (or output ="overlapping") and maxgap. For example, it 
+> outputs all overlapping and flanking genes within 5kb if set maxgap = 5000L 
+> and output ="overlapping".
+
+Thanks for letting us know. We have amended our comment regarding the differences between the two annotation strategies. We note that there are still some differences; in particular, for any given input region, "annotatePeakInBatch" with output="overlapping" reports each overlapping feature as a separate entry of the output object, while "detailRanges" reports all overlapping features in one string. The former provides more detail and is easier to use for further analysis, while the latter is more convenient for annotating an existing DB list that needs to be saved to file.
+
+> It seems that space is set to 50bp for both sharp peaks and broad peaks. 
+> Could you please comment on this?
+
+In general, the spacing governs the compromise between spatial resolution and computational convenience. Smaller spacings increase resolution, at the cost of increasing memory usage and runtime. However, for most ChIP-seq analyses, resolution is fundamentally limited by the width of the binding event and by the size of the post-sonication fragments. As long as the spacing is smaller than either of these two parameters (i.e., the window size and the extension length), there will be enough windows to profile each interval of the genome for a satisfactory analysis. Smaller spacings and additional windows will provide no benefit, and will only increase computational work. This is true for both TF and histone mark analyses, such that the choice of spacing interval does not need to be changed between them. We have added a brief remark about this to the workflow.
+
+> We notice that the width for local background is set to 2kb for broad peaks 
+> and 10kb for sharp peaks. Could you please justify?
+
+A local background of 2 kbp can also be used for sharp peaks. We have used 10 kbp for convenience; the counts for large bins were already loaded for normalization in the previous step, so it makes sense to re-use them for filtering. In general, smaller bins provide a more accurate estimate of the background abundance, as unbound regions can be distinguished from binding sites more effectively. However, loss of spatial resolution is negligible for large background regions in the CBP data set. We have added a comment about this to the workflow.
+
+> Would adding a fitted line in Figure 3 and Figure 4 help with the 
+> visualization?
+
+We believe that the trend in the log-fold changes is obvious enough without the need for a fitted line.
+
+> In addition, it would be great if you could provide recommendations on how 
+> to evaluate the quality of the BCV in Figure 5. Is there a range or specific 
+> shape we are targeting?
+
+As a general rule, we expect to see a curve that decreases to a plateau with increasing average abundance. This reflects the increased reliability of the data at large counts, where the effects of stochasticity and technical artifacts (e.g., mapping errors, PCR duplicates) are averaged out. In Figure 5, the range of abundances is such that the plateau has already been reached; a more dramatic decrease can be observed by including more lower-abundance windows.
