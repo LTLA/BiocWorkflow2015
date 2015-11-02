@@ -346,7 +346,7 @@ To analyze H3K9ac data, a window size of 150 bp is used here.
 This corresponds roughly to the length of the DNA in a nucleosome [@humburg2011chipseqr], which is the smallest relevant unit for studying histone mark enrichment.
 The spacing between windows is set to the default of 50 bp, i.e., the start positions for adjacent windows are 50 bp apart.
 Smaller spacings can be used to improve spatial resolution, but will increase memory usage and runtime by increasing the number of windows required to cover the genome.
-This is unnecessary as small spacings confer little practical benefit for this data set -- counts for very closely spaced windows will be practically identical.
+This is unnecessary as increased resolution confers little practical benefit for this data set -- counts for very closely spaced windows will be practically identical.
 Finally, windows with very low counts (by default, less than a sum of 10 across all libraries) are removed to reduce memory usage.
 This represents a preliminary filter to remove uninteresting windows corresponding to likely background regions.
 
@@ -454,10 +454,9 @@ smoothScatter(win.ab, norm.fc, ylim=c(-6, 6), xlim=c(0, 5),
 
 The implicit assumption of non-linear methods is that most windows at each abundance are not DB.
 Any systematic difference between libraries is attributed to bias and is removed.
-This is not appropriate in situations where large-scale DB is expected, as removal of the difference would result in loss of genuine DB 
-    (an alternative normalization strategy for such cases will be described later in the CBP analysis).
-However, there is no indication that such changes are present in this data set, especially given that the cell types being compared are quite closely related.
-This suggests that non-linear normalization can be applied without too much concern.
+The assumption of a non-DB majority is reasonable for this data set, given that the cell types being compared are quite closely related.
+However, it is not appropriate in situations where large-scale DB is expected, as removal of the difference would result in loss of genuine DB.
+An alternative normalization strategy for these situations will be described later in the CBP analysis.
 
 <!-- 
 The high-abundance tail at zero (before normalization) probably represents microsatellites that have been amplified up.
