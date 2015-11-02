@@ -58,7 +58,7 @@ In addition, the code can be easily adapted to accommodate batch effects, covari
 The workflow is based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating].
 It contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
 Reads are first aligned to the genome using the `r Biocpkg("Rsubread")` package [@liao2013subread].
-These are counted into sliding windows with `r Biocpkg("csaw")`, to quantify binding intensity across the genome [@lun2014denovo].
+These are counted into sliding windows with `r Biocpkg("csaw")`, to quantify binding intensity across the genome [@lun2014denovo; @lun2015csaw].
 Statistical modelling is based on the negative binomial (NB) distribution with generalized linear models (GLMs) 
     in the `r Biocpkg("edgeR")` package [@robinson2010edger; @mccarthy2012differential], 
     with additional sophistication provided by quasi-likelihood (QL) methods [@lund2012ql].
