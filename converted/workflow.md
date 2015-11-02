@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 1 September 2015
+date: 2 November 2015
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -49,7 +49,7 @@ In addition, the code can be easily adapted to accommodate batch effects, covari
 The workflow is based primarily on software packages from the open-source Bioconductor project [@huber2015orchestrating].
 It contains all steps that are necessary for detecting DB regions, starting from the raw read sequences.
 Reads are first aligned to the genome using the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
-These are counted into sliding windows with *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, to quantify binding intensity across the genome [@lun2014denovo].
+These are counted into sliding windows with *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, to quantify binding intensity across the genome [@lun2014denovo; @lun2015csaw].
 Statistical modelling is based on the negative binomial (NB) distribution with generalized linear models (GLMs) 
     in the *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)* package [@robinson2010edger; @mccarthy2012differential], 
     with additional sophistication provided by quasi-likelihood (QL) methods [@lund2012ql].
@@ -59,6 +59,8 @@ Finally, annotation and visualization of the DB regions is described using *[Gvi
 The application of the methods in this article will be demonstrated on two publicly available ChIP-seq data sets.
 The first data set studies changes in H3K9ac marking between pro-B and mature B cells [@domingo2012bcell].
 The second data set studies changes in CREB-binding protein (CBP) binding between wild-type and CBP knock-out cells [@kasper2014genomewide].
+These two studies were chosen to represent common situations where a DB analysis can be applied --
+    one involving sharp binding with CBP, and the other involving broader marking with H3K9ac.
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
 The intention is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
 
@@ -268,15 +270,16 @@ data.frame(BAM=bam.files, CellType=celltype)
 
 In the *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* package, the `readParam` object determines which reads are extracted from the BAM files.
 The idea is to set this up once and to re-use it in all relevant functions.
-For this analysis, reads are only used if they have a mapping quality score above 50.
+For this analysis, reads are only used if they have a mapping quality (MAPQ) score equal to or above 50.
 This avoids spurious results due to weak or non-unique alignments.
+While a MAPQ threshold of 50 is quite conservative, a stringent threshold is necessary here due to the short length of the reads.
 Reads are also ignored if they map within blacklist regions or if they do not map to the standard set of mouse nuclear chromosomes.
 
 
 ```r
 library(csaw)
-param <- readParam(minq=50, discard=blacklist,
-    restrict=paste0("chr", c(1:19, "X", "Y")))
+standard.chr <- paste0("chr", c(1:19, "X", "Y"))
+param <- readParam(minq=50, discard=blacklist, restrict=standard.chr)
 ```
 
 ## Computing the average fragment length
@@ -341,12 +344,15 @@ win.data
 
 To analyze H3K9ac data, a window size of 150 bp is used here.
 This corresponds roughly to the length of the DNA in a nucleosome [@humburg2011chipseqr], which is the smallest relevant unit for studying histone mark enrichment.
-The spacing between windows is set to the default of 50 bp, i.e., adjacent window starts are 50 bp apart.
-By default, windows with very low counts are removed to reduce memory use.
+The spacing between windows is set to the default of 50 bp, i.e., the start positions for adjacent windows are 50 bp apart.
+Smaller spacings can be used to improve spatial resolution, but will increase memory usage and runtime by increasing the number of windows required to cover the genome.
+This is unnecessary as small spacings confer little practical benefit for this data set -- counts for very closely spaced windows will be practically identical.
+Finally, windows with very low counts (by default, less than a sum of 10 across all libraries) are removed to reduce memory usage.
+This represents a preliminary filter to remove uninteresting windows corresponding to likely background regions.
 
 ## Filtering windows by abundance
 
-Low-abundance windows contain no binding sites and need to be filtered out.
+As previously mentioned, low-abundance windows contain no binding sites and need to be filtered out.
 This improves power by removing irrelevant tests prior to the multiple testing correction;
     avoids problems with discreteness in downstream statistical methods; 
     and reduces computational work for further analyses.
@@ -355,7 +361,8 @@ This performs well as an independent filter statistic for NB-distributed count d
 
 The filter threshold is defined based on the assumption that most regions in the genome are not marked by H3K9ac.
 Reads are counted into large bins and the median coverage across those bins is used as an estimate of the background abundance.
-Windows are only retained if they have abundances 3-fold higher than the background.
+This estimate is then compared to the average abundances of the windows, after rescaling to account for differences in the window and bin sizes.
+Windows are only retained if they have abundances 3-fold higher than the background. 
 This removes a large number of windows that are weakly or not marked and are likely to be irrelevant.
 
 
@@ -447,8 +454,10 @@ smoothScatter(win.ab, norm.fc, ylim=c(-6, 6), xlim=c(0, 5),
 
 The implicit assumption of non-linear methods is that most windows at each abundance are not DB.
 Any systematic difference between libraries is attributed to bias and is removed.
-This is not appropriate in situations where large-scale DB is expected, as removal of the difference would result in loss of genuine DB.
-However, there is no indication that such changes are present in this data set, so non-linear methods can be applied without too much concern.
+This is not appropriate in situations where large-scale DB is expected, as removal of the difference would result in loss of genuine DB 
+    (an alternative normalization strategy for such cases will be described later in the CBP analysis).
+However, there is no indication that such changes are present in this data set, especially given that the cell types being compared are quite closely related.
+This suggests that non-linear normalization can be applied without too much concern.
 
 <!-- 
 The high-abundance tail at zero (before normalization) probably represents microsatellites that have been amplified up.
@@ -511,7 +520,10 @@ summary(y$trended.dispersion)
 
 The NB dispersion trend is visualized in Figure 5 as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
 A trend that decreases to a plateau with increasing abundance is typical of many analyses, including those of RNA-seq and ChIP-seq data.
-Note that only the trended dispersion will be used here -- the common and tagwise values are only shown for diagnostic purposes.
+Note that only the trended dispersion will be used in the downstream steps -- the common and tagwise values are only shown for diagnostic purposes.
+Specifically, the common BCV provides an overall measure of the variability in the data set, averaged across all windows.
+Data sets with common BCVs ranging from 10 to 20% are considered to have low variability, i.e., counts are highly reproducible.
+The tagwise BCVs should also be dispersed above and below the fitted trend, indicating that the fit was successful.
 
 
 ```r
@@ -519,6 +531,11 @@ plotBCV(y)
 ```
 
 ![**Figure 5:** Abundance-dependent trend in the BCV for each window, represented by the blue line. Common and tagwise estimates are also shown.](figure/bcvplot-1.png) 
+
+For most data sets, one would expect to see a trend that decreases to a plateau with increasing average abundance. 
+This reflects the greater reliability of large counts, where the effects of stochasticity and technical artifacts (e.g., mapping errors, PCR duplicates) are averaged out.
+In Figure 5, the range of abundances after filtering is such that the plateau has already been reached.
+This is still a satisfactory result, as it indicates that the retained windows have low variability and more power to detect DB.
 
 ### Estimating the QL dispersion
 
@@ -611,8 +628,7 @@ Chaining effects are mitigated by setting a maximum cluster width of 5 kbp.
 
 
 ```r
-merged <- mergeWindows(rowRanges(filtered.data), 
-    tol=100, max.width=5000)
+merged <- mergeWindows(rowRanges(filtered.data), tol=100, max.width=5000)
 ```
 
 A combined *p*-value is computed for each cluster using the method of @simes1986, based on the *p*-values of the constituent windows.
@@ -622,8 +638,6 @@ Applying the BH method to the combined *p*-values allows the region-level FDR to
 
 
 ```r
-merged <- mergeWindows(rowRanges(filtered.data), 
-    tol=100, max.width=5000)
 tabcom <- combineTests(merged$id, res$table)
 head(tabcom)
 ```
@@ -816,9 +830,10 @@ colnames(elementMetadata(anno.regions))
 ## [9] "fromOverlappingOrNearest"
 ```
 
-The behaviour of *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* complements that of  `detailRanges`.
-The latter reports all overlapping and flanking genes, while the former reports only the closest gene (but in greater detail).
-Which is preferable depends on the proclivities of the user and the purpose of the annotation.
+Alternatively, identification of all overlapping features within, say, 5 kbp can be achieved by setting `maxgap=5000` and `output="overlapping"` in `annotatePeakInBatch`.
+This will report each overlapping feature in a separate entry of the returned `GRanges` object, i.e., each input region may have multiple output values.
+In contrast, `detailRanges` will report all overlapping features for a region as a single string, i.e., each input region has one output value.
+Which is preferable depends on the purpose of the annotation -- the `detailRanges` output is more convenient for direct annotation of a DB list, while the `annotatePeakInBatch` output contains more information and is more convenient for further manipulation.
 
 ### Reporting gene-based results
 
@@ -1145,11 +1160,22 @@ For brevity, the code will not be shown here, as it is identical to that used fo
 
 ### Counting reads into windows
 
-First, the average fragment length is estimated by maximizing the cross-correlation function.
+First, a `readParam` object is constructed to standardize the parameter settings in this analysis.
+The ENCODE blacklist is again used to remove reads in problematic regions.
+For consistency, the MAPQ threshold of 50 is also re-used here for removing poorly aligned reads.
+Lower thresholds (e.g., from 10 to 20) can be used for longer reads with more reliable mapping locations - 
+    though in practice, the majority of long read alignments reported by *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* tend to have very high or very low MAPQ scores,
+    such that the exact choice of the MAPQ threshold is not a critical parameter.
 
 
 ```r
 param <- readParam(minq=50, discard=blacklist)
+```
+
+The average fragment length is estimated by maximizing the cross-correlation function, as previously described.
+
+
+```r
 x <- correlateReads(bam.files, param=reform(param, dedup=TRUE))
 frag.len <- which.max(x) - 1
 frag.len
@@ -1180,6 +1206,12 @@ win.data
 ## colnames: NULL
 ## colData names(4): bam.files totals ext param
 ```
+
+The default spacing of 50 bp is also used here.
+This may seem inappropriate, given that the windows are only 10 bp.
+However, reads lying in the interval between adjacent windows will still be counted into several windows.
+This is because reads are extended to the value of `frag.len`, which is substantially larger than the 50 bp spacing.
+Again, smaller spacings can be used but will provide little benefit, given that each extended read already overlaps multiple windows.
 
 ### Normalization for composition biases
 
@@ -1257,6 +1289,11 @@ summary(keep)
 filtered.data <- win.data[keep,]
 ```
 
+It should be noted that the 10 kbp bins are used here for filtering, while smaller 2 kbp bins were used in the corresponding step for the H3K9ac analysis.
+This is purely for convenience -- the 10 kbp counts for this data set were previously loaded for normalization, and can be re-used during filtering to save time.
+Changes in bin size will have little impact on the results, so long as the bins (and their counts) are large enough for precise estimation of the background abundance.
+While smaller bins provide greater spatial resolution, this is irrelevant for quantifying coverage in large background regions that span most of the genome.
+
 ### Statistical modelling of biological variability
 
 Counts for each window are modelled using *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)* as previously described.
@@ -1325,8 +1362,7 @@ This is expected, given that protein function should be lost in the KO genotype.
 ```r
 contrast <- makeContrasts(wt-ko, levels=design)
 res <- glmQLFTest(fit, contrast=contrast)
-merged <- mergeWindows(rowRanges(filtered.data), 
-    tol=100, max.width=5000)
+merged <- mergeWindows(rowRanges(filtered.data), tol=100, max.width=5000)
 tabcom <- combineTests(merged$id, res$table)
 tabbest <- getBestTest(merged$id, res$table)
 is.sig <- tabcom$FDR <= 0.05
@@ -1452,7 +1488,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.2.2 (2015-08-14)
+## R version 3.2.2 Patched (2015-10-30 r69588)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: CentOS release 6.4 (Final)
 ## 
@@ -1470,32 +1506,32 @@ sessionInfo()
 ## 
 ## other attached packages:
 ##  [1] Gviz_1.14.0                             
-##  [2] ChIPpeakAnno_3.4.0                      
+##  [2] ChIPpeakAnno_3.4.1                      
 ##  [3] VennDiagram_1.6.16                      
 ##  [4] futile.logger_1.4.1                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.22.0                  
+##  [6] GenomicFeatures_1.22.2                  
 ##  [7] org.Mm.eg.db_3.2.3                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
 ## [10] AnnotationDbi_1.32.0                    
 ## [11] edgeR_3.12.0                            
-## [12] limma_3.26.0                            
+## [12] limma_3.26.1                            
 ## [13] locfit_1.5-9.1                          
-## [14] statmod_1.4.21                          
+## [14] statmod_1.4.22                          
 ## [15] csaw_1.4.0                              
 ## [16] SummarizedExperiment_1.0.0              
 ## [17] Biobase_2.30.0                          
-## [18] rtracklayer_1.30.0                      
+## [18] rtracklayer_1.30.1                      
 ## [19] Rsamtools_1.22.0                        
 ## [20] Biostrings_2.38.0                       
 ## [21] XVector_0.10.0                          
 ## [22] GenomicRanges_1.22.0                    
 ## [23] GenomeInfoDb_1.6.0                      
-## [24] IRanges_2.4.0                           
+## [24] IRanges_2.4.1                           
 ## [25] S4Vectors_0.8.0                         
 ## [26] BiocGenerics_0.16.0                     
-## [27] Rsubread_1.20.0                         
+## [27] Rsubread_1.20.1                         
 ## [28] knitr_1.11                              
 ## [29] BiocStyle_1.8.0                         
 ## 
@@ -1519,17 +1555,17 @@ sessionInfo()
 ## [33] evaluate_0.8                 MASS_7.3-44                 
 ## [35] foreign_0.8-66               graph_1.48.0                
 ## [37] BiocInstaller_1.20.0         tools_3.2.2                 
-## [39] formatR_1.2.1                matrixStats_0.14.2          
+## [39] formatR_1.2.1                matrixStats_0.15.0          
 ## [41] stringr_1.0.0                munsell_0.4.2               
 ## [43] cluster_2.0.3                ensembldb_1.2.0             
 ## [45] lambda.r_1.1.7               RCurl_1.95-4.7              
-## [47] dichromat_2.0-0              VariantAnnotation_1.16.0    
+## [47] dichromat_2.0-0              VariantAnnotation_1.16.2    
 ## [49] bitops_1.0-6                 gtable_0.1.2                
 ## [51] multtest_2.26.0              reshape2_1.4.1              
 ## [53] R6_2.1.1                     gridExtra_2.0.0             
-## [55] GenomicAlignments_1.6.0      Hmisc_3.17-0                
+## [55] GenomicAlignments_1.6.1      Hmisc_3.17-0                
 ## [57] futile.options_1.0.0         KernSmooth_2.23-15          
-## [59] stringi_0.5-5                Rcpp_0.12.1                 
+## [59] stringi_1.0-1                Rcpp_0.12.1                 
 ## [61] rpart_4.1-10                 acepack_1.3-3.3
 ```
 
