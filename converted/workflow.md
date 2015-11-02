@@ -1476,7 +1476,7 @@ Readers are encouraged to apply the concepts and code presented in this article 
 
 # Software availability
 
-This workflow depends on various packages from version 3.1 of the Bioconductor project, running on *R* version 3.2.0 or higher.
+This workflow depends on various packages from version 3.2 of the Bioconductor project, running on *R* version 3.2.2 or higher.
 It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, *[edgeR](http://bioconductor.org/packages/release/bioc/html/edgeR.html)*, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*, *[Rsamtools](http://bioconductor.org/packages/release/bioc/html/Rsamtools.html)*, *[Gviz](http://bioconductor.org/packages/release/bioc/html/Gviz.html)*, *[rtracklayer](http://bioconductor.org/packages/release/bioc/html/rtracklayer.html)* and *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*.
 It also depends on the annotation packages *[org.Mm.eg.db](http://bioconductor.org/packages/release/data/annotation/html/org.Mm.eg.db.html)* and *[TxDb.Mmusculus.UCSC.mm10.knownGene](http://bioconductor.org/packages/release/data/annotation/html/TxDb.Mmusculus.UCSC.mm10.knownGene.html)*.
 Version numbers for all packages used are shown below.
