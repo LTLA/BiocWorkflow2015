@@ -804,7 +804,7 @@ meta <- elementMetadata(out.ranges)
 elementMetadata(out.ranges) <- data.frame(meta, anno)
 ```
 
-### Using the *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* package.
+### Using the *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* package
 
 As its name suggests, the *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* package is designed to annotate peaks from ChIP-seq experiments [@zhu2010chippeakanno].
 A `GRanges` object containing all regions of interest is supplied to the relevant function, after removing all previous metadata fields to reduce clutter.
@@ -1057,6 +1057,8 @@ Optimal detection of all features can be obtained by performing analyses with mu
     though -- for brevity -- this will not be described here.
 In general, smaller window sizes are preferred as strong DB events with sufficient coverage will always be detected.
 For larger windows, detection may be confounded by other events within the window that distort the log-fold change in the counts between conditions.
+
+
 
 
 
@@ -1466,6 +1468,8 @@ Note that that the `gax` and `greg` objects are the same as those used in the vi
 
 
 
+
+
 # Summary  
 
 This workflow describes the steps of a window-based DB analysis, from read alignment through to visualization of DB regions.
@@ -1509,7 +1513,7 @@ sessionInfo()
 ##  [3] VennDiagram_1.6.16                      
 ##  [4] futile.logger_1.4.1                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.22.2                  
+##  [6] GenomicFeatures_1.22.4                  
 ##  [7] org.Mm.eg.db_3.2.3                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
@@ -1519,18 +1523,18 @@ sessionInfo()
 ## [13] locfit_1.5-9.1                          
 ## [14] statmod_1.4.22                          
 ## [15] csaw_1.4.0                              
-## [16] SummarizedExperiment_1.0.0              
+## [16] SummarizedExperiment_1.0.1              
 ## [17] Biobase_2.30.0                          
 ## [18] rtracklayer_1.30.1                      
 ## [19] Rsamtools_1.22.0                        
 ## [20] Biostrings_2.38.0                       
 ## [21] XVector_0.10.0                          
-## [22] GenomicRanges_1.22.0                    
-## [23] GenomeInfoDb_1.6.0                      
+## [22] GenomicRanges_1.22.1                    
+## [23] GenomeInfoDb_1.6.1                      
 ## [24] IRanges_2.4.1                           
-## [25] S4Vectors_0.8.0                         
-## [26] BiocGenerics_0.16.0                     
-## [27] Rsubread_1.20.1                         
+## [25] S4Vectors_0.8.1                         
+## [26] BiocGenerics_0.16.1                     
+## [27] Rsubread_1.20.2                         
 ## [28] knitr_1.11                              
 ## [29] BiocStyle_1.8.0                         
 ## 
@@ -1545,7 +1549,7 @@ sessionInfo()
 ## [15] colorspace_1.2-6             htmltools_0.2.6             
 ## [17] httpuv_1.3.3                 plyr_1.8.3                  
 ## [19] XML_3.98-1.3                 biomaRt_2.26.0              
-## [21] zlibbioc_1.16.0              xtable_1.7-4                
+## [21] zlibbioc_1.16.0              xtable_1.8-0                
 ## [23] GO.db_3.2.2                  scales_0.3.0                
 ## [25] BiocParallel_1.4.0           ggplot2_1.0.1               
 ## [27] nnet_7.3-11                  proto_0.3-10                
@@ -1558,7 +1562,7 @@ sessionInfo()
 ## [41] stringr_1.0.0                munsell_0.4.2               
 ## [43] cluster_2.0.3                ensembldb_1.2.0             
 ## [45] lambda.r_1.1.7               RCurl_1.95-4.7              
-## [47] dichromat_2.0-0              VariantAnnotation_1.16.2    
+## [47] dichromat_2.0-0              VariantAnnotation_1.16.3    
 ## [49] bitops_1.0-6                 gtable_0.1.2                
 ## [51] multtest_2.26.0              reshape2_1.4.1              
 ## [53] R6_2.1.1                     gridExtra_2.0.0             
