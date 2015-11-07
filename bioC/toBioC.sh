@@ -2,10 +2,12 @@
 # 'biocbuild' flag is set to TRUE, to avoid the alignment steps that BioC can't
 # do (as the command line utilities aren't available). Instead, they're
 # starting from the BAM files. We also need to set keep.file to FALSE, in 
-# order to tell the build system to re-download the files.
+# order to tell the build system to re-download the files; and clear.memory 
+# to TRUE, in order to get it to delete objects to save memory.
 
 refdir='..'
-cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | sed "s/keep.files <- TRUE/keep.files <- FALSE/" > temp.Rmd
+cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | \
+    sed "s/keep.files <- TRUE/keep.files <- FALSE/" | sed "s/clear.memory <- FALSE/clear.memory <- TRUE/" > temp.Rmd
 
 # We also need to reformat the author listing and affiliations, because BioC's
 # rendering system assumes that the author YAML field is a simple string.
