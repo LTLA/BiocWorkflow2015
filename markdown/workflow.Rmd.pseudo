@@ -28,10 +28,10 @@ clear.memory <- FALSE # should we clear objects from memory?
 ```
 
 ```{r, eval=clear.memory, eval=TRUE, results='hide'}
-save.image("existing_obj.Rda")
+pre.existing <- "infile"
 protected <- c("blacklist", "gax", "greg", 
     "remap", "redownload", "keep.files", "clear.memory", 
-    "core.loc", "protected")
+    "core.loc", "protected", "pre.existing", pre.existing)
 ```
 
 # Introduction
@@ -1165,7 +1165,7 @@ unlink(paste0(bam.files, ".bai"))
 ```
 
 ```{r, eval=clear.memory, echo=FALSE, results="hide"}
-rm(list=setdiff(ls(), protected))
+rm(list=setdiff(ls(), pre.existing))
 gc()
 ```
 
@@ -1212,10 +1212,5 @@ Victorian State Government Operational Infrastructure Support; Australian Govern
 # Acknowledgements
 
 The authors would like to thank Prof. Stephen Nutt for his valuable insights on B-cell biology.
-
-```{r, eval=clear.memory, echo=FALSE, results="hide"}
-load("existing_obj.Rda")
-unlink("existing_obj.Rda")
-```
 
 # References
