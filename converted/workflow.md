@@ -17,6 +17,8 @@ bibliography: ref.bib
 
 
 
+
+
 # Introduction
 
 Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
@@ -106,7 +108,7 @@ for (sra in all.sra) {
 all.fastq <- paste0(sra.numbers, ".fastq")
 ```
 
-Technical replicates are merged together prior to further processing. 
+Reads from technical replicates are pooled together into a single FASTQ file prior to further processing. 
 This reflects the fact that they originate from a single library of DNA fragments.
 
 
@@ -120,9 +122,10 @@ for (group in names(by.group)) {
 group.fastq <- paste0(names(by.group), ".fastq")
 ```
 
-Reads in each library are aligned to the mm10 build of the mouse genome, using the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
+Reads in each library are aligned to the mm10 build of the mouse genome, using the `align` function in the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
 This assumes that an index has already been constructed with the prefix `index/mm10`.
-Here, a consensus threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32 bp).
+The function uses a seed-and-vote paradigm to quickly and accurately map reads to the genome, by focusing on locations that receive a number of votes above some consensus threshold.
+Here, a threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32--36 bp).
 The `type` parameter is also set to optimize for genomic alignment, rather than alignment to the transcriptome.
 
 
@@ -169,6 +172,7 @@ for (bam in bam.files) {
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
 Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+Note that only reads with unique mapping locations are reported by *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* as being successfully mapped.
 
 
 
@@ -356,13 +360,14 @@ As previously mentioned, low-abundance windows contain no binding sites and need
 This improves power by removing irrelevant tests prior to the multiple testing correction;
     avoids problems with discreteness in downstream statistical methods; 
     and reduces computational work for further analyses.
-Here, filtering is performed using the average abundance of each window [@mccarthy2012differential].
+Here, filtering is performed using the average abundance of each window [@mccarthy2012differential], which is defined as the average log-count per million for that window.
 This performs well as an independent filter statistic for NB-distributed count data [@lun2014denovo].
 
 The filter threshold is defined based on the assumption that most regions in the genome are not marked by H3K9ac.
 Reads are counted into large bins and the median coverage across those bins is used as an estimate of the background abundance.
 This estimate is then compared to the average abundances of the windows, after rescaling to account for differences in the window and bin sizes.
-Windows are only retained if they have abundances 3-fold higher than the background. 
+A window is only retained if its coverage is 3-fold higher than that of the background regions, 
+    i.e., the abundance of the window is greater than the background abundance estimate by log~2~(3) or more.
 This removes a large number of windows that are weakly or not marked and are likely to be irrelevant.
 
 
@@ -385,7 +390,8 @@ This suggests that the filter will remove most windows lying within background r
 
 
 ```r
-hist(filter.stat$back.abundances, xlab="Background abundance", main="", breaks=50)
+hist(filter.stat$back.abundances, main="", breaks=50,
+    xlab="Background abundance (log2-CPM)")
 threshold <- filter.stat$abundances[1] - filter.stat$filter[1] + log2(min.fc)
 abline(v=threshold, col="red")
 ```
@@ -418,7 +424,7 @@ smoothScatter(win.ab, logfc, ylim=c(-6, 6), xlim=c(0, 5),
 
 Trended biases cannot be removed by scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
 Rather, non-linear normalization methods must be used.
-*[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* implements a version of the fast loess method [@ballman2004fast] that is adapted to count data.
+*[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* implements a version of the fast loess method [@ballman2004fast] that has been modified to handle count data [@lun2015csaw].
 This produces a matrix of offsets that can be used during GLM fitting.
 
 
@@ -1513,26 +1519,26 @@ sessionInfo()
 ##  [3] VennDiagram_1.6.16                      
 ##  [4] futile.logger_1.4.1                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.22.4                  
+##  [6] GenomicFeatures_1.22.5                  
 ##  [7] org.Mm.eg.db_3.2.3                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
 ## [10] AnnotationDbi_1.32.0                    
 ## [11] edgeR_3.12.0                            
-## [12] limma_3.26.1                            
+## [12] limma_3.26.3                            
 ## [13] locfit_1.5-9.1                          
 ## [14] statmod_1.4.22                          
-## [15] csaw_1.4.0                              
+## [15] csaw_1.4.1                              
 ## [16] SummarizedExperiment_1.0.1              
 ## [17] Biobase_2.30.0                          
 ## [18] rtracklayer_1.30.1                      
 ## [19] Rsamtools_1.22.0                        
-## [20] Biostrings_2.38.0                       
+## [20] Biostrings_2.38.2                       
 ## [21] XVector_0.10.0                          
 ## [22] GenomicRanges_1.22.1                    
 ## [23] GenomeInfoDb_1.6.1                      
-## [24] IRanges_2.4.1                           
-## [25] S4Vectors_0.8.1                         
+## [24] IRanges_2.4.4                           
+## [25] S4Vectors_0.8.3                         
 ## [26] BiocGenerics_0.16.1                     
 ## [27] Rsubread_1.20.2                         
 ## [28] knitr_1.11                              
@@ -1540,7 +1546,7 @@ sessionInfo()
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] httr_1.0.0                   regioneR_1.2.0              
-##  [3] AnnotationHub_2.2.1          splines_3.2.2               
+##  [3] AnnotationHub_2.2.2          splines_3.2.2               
 ##  [5] Formula_1.2-1                shiny_0.12.2                
 ##  [7] interactiveDisplayBase_1.8.0 latticeExtra_0.6-26         
 ##  [9] RBGL_1.46.0                  BSgenome_1.38.0             
@@ -1548,16 +1554,16 @@ sessionInfo()
 ## [13] digest_0.6.8                 RColorBrewer_1.1-2          
 ## [15] colorspace_1.2-6             htmltools_0.2.6             
 ## [17] httpuv_1.3.3                 plyr_1.8.3                  
-## [19] XML_3.98-1.3                 biomaRt_2.26.0              
+## [19] XML_3.98-1.3                 biomaRt_2.26.1              
 ## [21] zlibbioc_1.16.0              xtable_1.8-0                
 ## [23] GO.db_3.2.2                  scales_0.3.0                
 ## [25] BiocParallel_1.4.0           ggplot2_1.0.1               
 ## [27] nnet_7.3-11                  proto_0.3-10                
 ## [29] survival_2.38-3              magrittr_1.5                
 ## [31] mime_0.4                     memoise_0.2.1               
-## [33] evaluate_0.8                 MASS_7.3-44                 
+## [33] evaluate_0.8                 MASS_7.3-45                 
 ## [35] foreign_0.8-66               graph_1.48.0                
-## [37] BiocInstaller_1.20.0         tools_3.2.2                 
+## [37] BiocInstaller_1.20.1         tools_3.2.2                 
 ## [39] formatR_1.2.1                matrixStats_0.15.0          
 ## [41] stringr_1.0.0                munsell_0.4.2               
 ## [43] cluster_2.0.3                ensembldb_1.2.0             
@@ -1568,7 +1574,7 @@ sessionInfo()
 ## [53] R6_2.1.1                     gridExtra_2.0.0             
 ## [55] GenomicAlignments_1.6.1      Hmisc_3.17-0                
 ## [57] futile.options_1.0.0         KernSmooth_2.23-15          
-## [59] stringi_1.0-1                Rcpp_0.12.1                 
+## [59] stringi_1.0-1                Rcpp_0.12.2                 
 ## [61] rpart_4.1-10                 acepack_1.3-3.3
 ```
 
