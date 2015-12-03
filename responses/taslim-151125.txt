@@ -1,0 +1,39 @@
+Thank you for your report.  You asked for more details of the methodology in a number of places, and we have added further details as appropriate.  We are puzzled about your approval "with reservations", as we did not find any criticisms in your report, apart from the Figure 2 x-label not being explicit about the log-scale used.
+
+> “Reads are first aligned to the genome using the Rsubread package (Liao et al., 2013).” Please describe what algorithm is used to align the reads.
+
+The alignment algorithm in Rsubread package uses a seed-and-vote paradigm. We have added a very brief mention of this, though for a complete description of the algorithm, it would be advisable to consult the Liao et al. reference. We note that the differences between different aligners are not relevant to this workflow article. What is relevant is that the subread aligner is an appropriate aligner for ChIP-seq data, and that it is available as a native implementation in a Bioconductor package.
+
+> "Technical replicates are merged together prior to further processing." What does merged together mean? Concatenate? Or average? Or pick one randomly?
+
+Merging simply refers to pooling the reads from all replicates into a single library. We have altered the wording to make this more obvious.
+
+> "Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low." Proportion mapped is those reads that can be uniquely mapped to the genome?
+
+Yes. By default, Rsubread only reports mapped reads as those with unique mapping locations. We have added a mention of this to the text.
+
+> "Thus, the marking status of each read will be ignored in the rest of the analysis, i.e., no duplicates will be removed in downstream steps." I believe generally people exclude duplicates in downstream steps?
+
+Duplicate removal is not recommended for routine DB analyses with edgeR. It will reduce detection power by capping read coverage at strongly bound sites, such that a region that is DB may not be detected if the coverage of that region gets capped to the same level in two libraries. It may also increase false positives for analyses involving different library sizes, when the same cap is applied across libraries; subsequent normalization for library size will result in a spurious difference in the capped heights.
+
+In theory, duplicate removal should only be necessary and appropriate when a large portion of duplicate reads arise from PCR duplicates of the same DNA fragment. This should seldom occur unless the amount of DNA is overly small, in which case there are likely to be more general problems with data quality.
+
+> "By default, windows with very low counts are removed to reduce memory use." What is the definition of very low counts? <=1? If it is described by the section filtering windows by abundance, please mention it.
+
+The internal filter in windowCounts removes windows with count sums less than 10 across all libraries, simply to reduce memory usage. Windows with such low counts will not provide sufficent evidence for detecting DB, so their removal does not seem like a major loss. We have added a mention of this threshold to the text.
+
+> In code above, where is the background? I assumed it is filter.stat$filter[1]? However, it looks like the filter is background + log2(3)? If it’s at least 3-fold background, shouldn’t it be filter.stat$filter[1]*3?
+
+By default, abundances in edgeR are reported as log-CPMs. So, a 3-fold increase over the background coverage corresponds to a log2(3) increase in the abundance. This has been reworded for more clarity.
+
+> Figure 2 doesn’t make sense. Why is there windows with < 0 abundance?
+
+Again, abundances are reported as log-CPMs, for which it is entirely possible to obtain negative values. We have clarified this on the x-axis label.
+
+> Normalizing for library-specific trended biases. Figure 3 only shows log-fold change between mature B and pro-B but there is more than one sample in mature B and pro-B. How do you apply the normalization? Do you take average of all mature B samples and average of all pro-B samples and then do the loess normalization?
+
+The algorithm constructs an average library containing average counts across all samples for each window. It then performs loess normalization between each sample and this average sample. A full description is available in our recently published paper (doi: 10.1093/nar/gkv1191, to which we have added a reference), but is beyond the scope of this workflow article.
+ 
+> How do you interpret this results? For Mdn1, there are 29 DB windows? What are the logFC.up and logFC.down. 
+
+We have already described the meaning of these fields in the text following the first call to combineTests(), in the section "Controlling the FDR across regions". The same interpretation can be applied to the output of all combineTests() calls.
