@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 2 November 2015
+date: 21 December 2015
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -173,7 +173,7 @@ for (bam in bam.files) {
 ```
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
-Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+Ideally, the proportion of mapped reads should be high (70-80% or higher), while the proportion of marked reads should be low (below 20%).
 Note that only reads with unique mapping locations are reported by `r Biocpkg("Rsubread")` as being successfully mapped.
 
 ```{r, eval=!remap, results="hide", echo=FALSE, message=FALSE}
@@ -259,10 +259,13 @@ blacklist <- unlist(blacklist)
 saveRDS(file="mm10-blacklist.rds", blacklist)
 ```
 
-An alternative approach is to use predicted repeat regions from the UCSC genome annotation [@rosenbloom2015ucsc].
+Any user-defined set of regions can be used as a blacklist in this analysis.
+For example, one could use predicted repeat regions from the UCSC genome annotation [@rosenbloom2015ucsc].
 This tends to remove a greater number of problematic regions (especially microsatellites) compared to the ENCODE blacklist.
 However, the size of the UCSC list means that genuine DB sites may also be removed.
 Thus, the ENCODE blacklist is preferred for most applications.
+Alternatively, if negative control libraries are available, they can be used to empirically identify problematic regions with the `r Biocpkg("GreyListChIP")` package.
+These regions should be ignored as they have high coverage in the controls and are unlikely to be genuine binding sites.
 
 # Testing for DB between pro-B and mature B cells
 
@@ -322,6 +325,7 @@ Thus, the marking status of each read will be ignored in the rest of the analysi
 Each read is directionally extended to the average fragment length, to represent the DNA fragment from which that read was sequenced.
 The number of extended reads overlapping a window is counted.
 The window is then moved to its next position on the genome, and counting is repeated.
+(Each read is usually counted into multiple windows, which will introduce correlations between adjacent windows but will not otherwise affect the analysis.)
 This is done for all libraries such that a count is obtained for each window in each library.
 The `windowCounts` function produces a `RangedSummarizedExperiment` object containing these counts in matrix form, where each row corresponds to a window and each column represents a library.
 
@@ -442,6 +446,10 @@ design <- model.matrix(~0+celltype)
 colnames(design) <- levels(celltype)
 design
 ```
+
+As a general rule, the experimental design should contain at least two replicates in each of the biological conditions. 
+This ensures that the results for each condition are replicable and are not the result of technical artifacts such as PCR duplicates. 
+Obviously, more replicates will provide more power to detect DB accurately and reliability, albeit at the cost of time and experimental resources.
 
 ### Estimating the NB dispersion
 
@@ -1066,8 +1074,6 @@ design
 Estimation of the NB and QL dispersions is then performed.
 The estimated NB dispersions are substantially larger than those observed in the H3K9ac data set.
 In addition, the estimated prior d.f. is infinite.
-This is consistent with a batch effect between replicates.
-The dispersions for all windows are inflated to a similarly large value by the batch effect, resulting in low variability in the dispersions across windows.
 
 ```{r}
 y <- asDGEList(filtered.data, norm.factors=normfacs)
@@ -1075,6 +1081,16 @@ y <- estimateDisp(y, design)
 summary(y$trended.dispersion)
 fit <- glmQLFit(y, design, robust=TRUE)
 summary(fit$df.prior)
+```
+
+These statistics are consistent with the presence of a batch effect between replicates.
+The dispersions for all windows are inflated to a similarly large value by the batch effect, resulting in low variability in the dispersions across windows.
+This is illustrated in Figure ((mdsplot2)) where the WT libraries are clearly separated in both dimensions of the MDS plot.
+In particular, separation of replicates on the first dimension is indicative of a systematic difference of size comparable to that between genotypes.
+
+```{r mdsplot2, fig.cap="MDS plot with two dimensions for all libraries in the CBP data set. Libraries are labelled and coloured according to the genotype. A larger top set of windows was used to improve the visualization of the genome-wide differences between the WT libraries."}
+plotMDS(cpm(y, log=TRUE), top=10000, labels=genotype,
+    col=c("red", "blue")[as.integer(genotype)])
 ```
 
 The presence of a large batch effect between replicates is not ideal.
@@ -1197,6 +1213,7 @@ Readers should note that the read alignment steps for each data set can only be 
 This is because the various `system` calls assume that a Unix-style command-line interface is present.
 In addition, `r Biocpkg("Rsubread")` is not supported for Windows.
 However, downstream analyses of the BAM files can be performed using any platform on which *R* can be installed.
+The entire workflow takes 3-4 hours to run and requires 10 GB of RAM.
 
 # Author contributions
 
