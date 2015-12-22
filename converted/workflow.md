@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 2 November 2015
+date: 21 December 2015
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -171,7 +171,7 @@ for (bam in bam.files) {
 ```
 
 The behaviour of the alignment pipeline for this data set can be easily summarized with some statistics.
-Ideally, the proportion of mapped reads should be high, while the proportion of marked reads should be low.
+Ideally, the proportion of mapped reads should be high (70-80% or higher), while the proportion of marked reads should be low (below 20%).
 Note that only reads with unique mapping locations are reported by *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* as being successfully mapped.
 
 
@@ -245,10 +245,13 @@ blacklist <- unlist(blacklist)
 saveRDS(file="mm10-blacklist.rds", blacklist)
 ```
 
-An alternative approach is to use predicted repeat regions from the UCSC genome annotation [@rosenbloom2015ucsc].
+Any user-defined set of regions can be used as a blacklist in this analysis.
+For example, one could use predicted repeat regions from the UCSC genome annotation [@rosenbloom2015ucsc].
 This tends to remove a greater number of problematic regions (especially microsatellites) compared to the ENCODE blacklist.
 However, the size of the UCSC list means that genuine DB sites may also be removed.
 Thus, the ENCODE blacklist is preferred for most applications.
+Alternatively, if negative control libraries are available, they can be used to empirically identify problematic regions with the *[GreyListChIP](http://bioconductor.org/packages/release/bioc/html/GreyListChIP.html)* package.
+These regions should be ignored as they have high coverage in the controls and are unlikely to be genuine binding sites.
 
 # Testing for DB between pro-B and mature B cells
 
@@ -326,6 +329,7 @@ Thus, the marking status of each read will be ignored in the rest of the analysi
 Each read is directionally extended to the average fragment length, to represent the DNA fragment from which that read was sequenced.
 The number of extended reads overlapping a window is counted.
 The window is then moved to its next position on the genome, and counting is repeated.
+(Each read is usually counted into multiple windows, which will introduce correlations between adjacent windows but will not otherwise affect the analysis.)
 This is done for all libraries such that a count is obtained for each window in each library.
 The `windowCounts` function produces a `RangedSummarizedExperiment` object containing these counts in matrix form, where each row corresponds to a window and each column represents a library.
 
@@ -499,6 +503,10 @@ design
 ## attr(,"contrasts")$celltype
 ## [1] "contr.treatment"
 ```
+
+As a general rule, the experimental design should contain at least two replicates in each of the biological conditions. 
+This ensures that the results for each condition are replicable and are not the result of technical artifacts such as PCR duplicates. 
+Obviously, more replicates will provide more power to detect DB accurately and reliability, albeit at the cost of time and experimental resources.
 
 ### Estimating the NB dispersion
 
@@ -1330,8 +1338,6 @@ design
 Estimation of the NB and QL dispersions is then performed.
 The estimated NB dispersions are substantially larger than those observed in the H3K9ac data set.
 In addition, the estimated prior d.f. is infinite.
-This is consistent with a batch effect between replicates.
-The dispersions for all windows are inflated to a similarly large value by the batch effect, resulting in low variability in the dispersions across windows.
 
 
 ```r
@@ -1354,6 +1360,19 @@ summary(fit$df.prior)
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##     Inf     Inf     Inf     Inf     Inf     Inf
 ```
+
+These statistics are consistent with the presence of a batch effect between replicates.
+The dispersions for all windows are inflated to a similarly large value by the batch effect, resulting in low variability in the dispersions across windows.
+This is illustrated in Figure 12 where the WT libraries are clearly separated in both dimensions of the MDS plot.
+In particular, separation of replicates on the first dimension is indicative of a systematic difference of size comparable to that between genotypes.
+
+
+```r
+plotMDS(cpm(y, log=TRUE), top=10000, labels=genotype,
+    col=c("red", "blue")[as.integer(genotype)])
+```
+
+![**Figure 12:** MDS plot with two dimensions for all libraries in the CBP data set. Libraries are labelled and coloured according to the genotype. A larger top set of windows was used to improve the visualization of the genome-wide differences between the WT libraries.](figure/mdsplot2-1.png) 
 
 The presence of a large batch effect between replicates is not ideal.
 Nonetheless, the DB analysis can proceed, albeit with some loss of power due to the inflated NB dispersions.
@@ -1446,7 +1465,7 @@ cur.region
 
 Plotting is performed using two tracks for each library -- one for the forward-strand coverage, another for the reverse-strand coverage.
 This allows visualization of the strand bimodality that is characteristic of genuine TF binding sites.
-In Figure 12, two adjacent sites are present at the *Gbe1* promoter, both of which exhibit increased binding in the WT genotype.
+In Figure 13, two adjacent sites are present at the *Gbe1* promoter, both of which exhibit increased binding in the WT genotype.
 Coverage is also substantially different between the WT replicates, consistent with the presence of a batch effect.
 
 
@@ -1468,7 +1487,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 12:** Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
+![**Figure 13:** Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
 
@@ -1515,15 +1534,15 @@ sessionInfo()
 ## 
 ## other attached packages:
 ##  [1] Gviz_1.14.0                             
-##  [2] ChIPpeakAnno_3.4.1                      
+##  [2] ChIPpeakAnno_3.4.3                      
 ##  [3] VennDiagram_1.6.16                      
 ##  [4] futile.logger_1.4.1                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.22.5                  
+##  [6] GenomicFeatures_1.22.7                  
 ##  [7] org.Mm.eg.db_3.2.3                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
-## [10] AnnotationDbi_1.32.0                    
+## [10] AnnotationDbi_1.32.2                    
 ## [11] edgeR_3.12.0                            
 ## [12] limma_3.26.3                            
 ## [13] locfit_1.5-9.1                          
@@ -1535,10 +1554,10 @@ sessionInfo()
 ## [19] Rsamtools_1.22.0                        
 ## [20] Biostrings_2.38.2                       
 ## [21] XVector_0.10.0                          
-## [22] GenomicRanges_1.22.1                    
+## [22] GenomicRanges_1.22.2                    
 ## [23] GenomeInfoDb_1.6.1                      
-## [24] IRanges_2.4.4                           
-## [25] S4Vectors_0.8.3                         
+## [24] IRanges_2.4.6                           
+## [25] S4Vectors_0.8.5                         
 ## [26] BiocGenerics_0.16.1                     
 ## [27] Rsubread_1.20.2                         
 ## [28] knitr_1.11                              
@@ -1557,25 +1576,24 @@ sessionInfo()
 ## [19] XML_3.98-1.3                 biomaRt_2.26.1              
 ## [21] zlibbioc_1.16.0              xtable_1.8-0                
 ## [23] GO.db_3.2.2                  scales_0.3.0                
-## [25] BiocParallel_1.4.0           ggplot2_1.0.1               
-## [27] nnet_7.3-11                  proto_0.3-10                
-## [29] survival_2.38-3              magrittr_1.5                
-## [31] mime_0.4                     memoise_0.2.1               
-## [33] evaluate_0.8                 MASS_7.3-45                 
-## [35] foreign_0.8-66               graph_1.48.0                
-## [37] BiocInstaller_1.20.1         tools_3.2.2                 
-## [39] formatR_1.2.1                matrixStats_0.15.0          
-## [41] stringr_1.0.0                munsell_0.4.2               
-## [43] cluster_2.0.3                ensembldb_1.2.0             
-## [45] lambda.r_1.1.7               RCurl_1.95-4.7              
-## [47] dichromat_2.0-0              VariantAnnotation_1.16.3    
-## [49] bitops_1.0-6                 gtable_0.1.2                
-## [51] multtest_2.26.0              reshape2_1.4.1              
-## [53] R6_2.1.1                     gridExtra_2.0.0             
-## [55] GenomicAlignments_1.6.1      Hmisc_3.17-0                
-## [57] futile.options_1.0.0         KernSmooth_2.23-15          
-## [59] stringi_1.0-1                Rcpp_0.12.2                 
-## [61] rpart_4.1-10                 acepack_1.3-3.3
+## [25] BiocParallel_1.4.3           ggplot2_2.0.0               
+## [27] nnet_7.3-11                  survival_2.38-3             
+## [29] magrittr_1.5                 mime_0.4                    
+## [31] memoise_0.2.1                evaluate_0.8                
+## [33] MASS_7.3-45                  foreign_0.8-66              
+## [35] graph_1.48.0                 BiocInstaller_1.20.1        
+## [37] tools_3.2.2                  formatR_1.2.1               
+## [39] matrixStats_0.50.1           stringr_1.0.0               
+## [41] munsell_0.4.2                cluster_2.0.3               
+## [43] ensembldb_1.2.1              lambda.r_1.1.7              
+## [45] RCurl_1.95-4.7               dichromat_2.0-0             
+## [47] VariantAnnotation_1.16.4     bitops_1.0-6                
+## [49] gtable_0.1.2                 multtest_2.26.0             
+## [51] R6_2.1.1                     gridExtra_2.0.0             
+## [53] GenomicAlignments_1.6.1      Hmisc_3.17-1                
+## [55] futile.options_1.0.0         KernSmooth_2.23-15          
+## [57] stringi_1.0-1                Rcpp_0.12.2                 
+## [59] rpart_4.1-10                 acepack_1.3-3.3
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
@@ -1583,6 +1601,7 @@ Readers should note that the read alignment steps for each data set can only be 
 This is because the various `system` calls assume that a Unix-style command-line interface is present.
 In addition, *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* is not supported for Windows.
 However, downstream analyses of the BAM files can be performed using any platform on which *R* can be installed.
+The entire workflow takes 7-8 hours to run and requires 10 GB of RAM.
 
 # Author contributions
 
