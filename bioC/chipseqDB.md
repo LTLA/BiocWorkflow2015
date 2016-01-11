@@ -58,7 +58,7 @@ Introduction
 Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular
 technique for identifying the genomic binding sites of a target protein.
 Conventional analyses of ChIP-seq data aim to detect absolute binding
-(i.e., the presence or absence of a binding sites) based on peaks in the
+(i.e., the presence or absence of a binding site) based on peaks in the
 read coverage. However, a number of recent studies have focused on the
 detection of changes in the binding profile between conditions
 (Ross-Innes et al. 2012; Pal et al. 2013). These differential binding
@@ -198,11 +198,11 @@ using the `align` function in the
 package (Liao, Smyth, and Shi 2013). This assumes that an index has
 already been constructed with the prefix `index/mm10`. The function uses
 a seed-and-vote paradigm to quickly and accurately map reads to the
-genome, by focusing on locations that receive a number of votes above
-some consensus threshold. Here, a threshold of 2 is used instead of the
-default of 3, to accommodate the shorter length of the reads (32--36
-bp). The `type` parameter is also set to optimize for genomic alignment,
-rather than alignment to the transcriptome.
+genome by focusing on locations that receive a number of votes above
+some consensus threshold. Here, a threshold of 2 votes is used instead
+of the default of 3, to accommodate the short length of the reads
+(32--36 bp). The `type` parameter is also set to optimize for genomic
+alignment, rather than alignment to the transcriptome.
 
     library(Rsubread)
     bam.files <- paste0(names(by.group), ".bam")
@@ -210,7 +210,7 @@ rather than alignment to the transcriptome.
         input_format="FASTQ", output_file=bam.files)
 
 In each of the resulting BAM files, alignments are re-sorted by their
-mapping location. This is required for input into
+mapping locations. This is required for input into
 *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*,
 but is also useful for other programs like genome browsers that depend
 on sorting and indexing for rapid retrieval of reads.
@@ -365,8 +365,8 @@ Computing the average fragment length
 -------------------------------------
 
 Strand bimodality is often observed in ChIP-seq experiments involving
-sharp binding events like H3K9ac marking. This refers to the presence of
-distinct subpeaks on each strand and can be quantified with
+narrow binding events like H3K9ac marking. This refers to the presence
+of distinct subpeaks on each strand and can be quantified with
 cross-correlation plots (Kharchenko, Tolstorukov, and Park 2008). A
 strong peak in the cross-correlations should be observed if
 immunoprecipitation was successful. The delay distance at the peak
@@ -497,11 +497,11 @@ The actual filtering itself is done by simply subsetting the
 Normalizing for library-specific trended biases
 -----------------------------------------------
 
-Normalization is required prior to any comparisons between libraries, to
-eliminate confounding library-specific biases. In particular, a trended
-bias is often observed between libraries in Figure 3. This refers to a
-systematic fold-difference in window coverage between libraries that
-changes according to the average abundance of the window.
+Normalization is required to eliminate confounding library-specific
+biases prior to any comparisons between libraries. In particular, a
+trended bias is often observed between libraries in Figure 3. This
+refers to a systematic fold-difference in window coverage between
+libraries that changes according to the average abundance of the window.
 
     win.ab <- filter.stat$abundances[keep]
     adjc <- log2(assay(filtered.data)+0.5)
@@ -547,9 +547,9 @@ successful in removing the differences between libraries.
         xlab="Average abundance", ylab="Log-fold change")
 
 ![**Figure 4:** Effect of non-linear normalization on the trended bias
-between two H3K9ac libraries. Log-fold changes for all windows are shown
-after
-normalization.](chipseq_db_files/figure-markdown_strict/normplot-1.png)
+between two H3K9ac libraries. Normalized log-fold changes are shown for
+all windows retained after
+filtering.](chipseq_db_files/figure-markdown_strict/normplot-1.png)
 
 The implicit assumption of non-linear methods is that most windows at
 each abundance are not DB. Any systematic difference between libraries
@@ -633,8 +633,8 @@ that the fit was successful.
     plotBCV(y)
 
 ![**Figure 5:** Abundance-dependent trend in the BCV for each window,
-represented by the blue line. Common and tagwise estimates are also
-shown.](chipseq_db_files/figure-markdown_strict/bcvplot-1.png)
+represented by the blue line. Common (red) and tagwise estimates (black)
+are also shown.](chipseq_db_files/figure-markdown_strict/bcvplot-1.png)
 
 For most data sets, one would expect to see a trend that decreases to a
 plateau with increasing average abundance. This reflects the greater
@@ -710,9 +710,10 @@ using the QL F-test (Lund et al. 2012). This is superior to the
 likelihood ratio test that is typically used for GLMs, as the QL F-test
 accounts for the uncertainty in dispersion estimation. One *p*-value is
 produced for each window, representing the evidence against the null
-hypothesis (i.e., no DB). For this analysis, the comparison is
-parametrized such that the reported log-fold changes represent that of
-pro-B cells over mature B counterparts.
+hypothesis (i.e., that no DB is present in the window). For this
+analysis, the comparison is parametrized such that the reported log-fold
+change for each window represents that of the coverage in pro-B cells
+over their mature B counterparts.
 
     contrast <- makeContrasts(proB-matureB, levels=design)
     res <- glmQLFTest(fit, contrast=contrast)
@@ -906,7 +907,7 @@ As its name suggests, the
 *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)*
 package is designed to annotate peaks from ChIP-seq experiments (Zhu et
 al. 2010). A `GRanges` object containing all regions of interest is
-supplied to the relevant function, after removing all previous metadata
+supplied to the relevant function after removing all previous metadata
 fields to reduce clutter. The gene closest to each region is then
 reported. Gene coordinates are taken from the NCBI mouse 38 annotation,
 which is roughly equivalent to the annotation in the mm10 genome build.
@@ -945,9 +946,10 @@ with, e.g., DE analyses of matching RNA-seq data. In the code below,
 promoter coordinates are obtained by running `detailRanges` without
 specifying any regions. All windows overlapping each promoter are
 defined as a cluster, and DB statistics are computed as previously
-described for each cluster/promoter. This directly yields results for
-annotated features (with some `NA` values, representing those promoters
-that have no overlapping windows).
+described for each cluster/promoter. This directly yields DB results for
+annotated features, along with some `NA` values representing promoters
+that have no overlapping windows (these are filtered out in the code
+below for demonstration purposes).
 
     anno.ranges <- detailRanges(orgdb=org.Mm.eg.db, 
        txdb=TxDb.Mmusculus.UCSC.mm10.knownGene)
@@ -964,13 +966,13 @@ that have no overlapping windows).
     ## 10  Mfap1b       19        1         10 0.107116609335 0.1441133306
     ## 13 Gm15772       30       12          7 0.085543435687 0.1193045223
 
-Note that this is distinct from counting reads across promoters. Using
-promoter-level counts would not provide enough spatial resolution to
-detect sharp binding events that only occur in a subinterval of the
-promoter. In particular, detection may be compromised by non-specific
-background or the presence of multiple opposing DB events in the same
-promoter. Combining window-level statistics is preferable as resolution
-is maintained for optimal performance.
+Note that this strategy is distinct from counting reads across
+promoters. Using promoter-level counts would not provide enough spatial
+resolution to detect sharp binding events that only occur in a
+subinterval of the promoter. In particular, detection may be compromised
+by non-specific background or the presence of multiple opposing DB
+events in the same promoter. Combining window-level statistics is
+preferable as resolution is maintained for optimal performance.
 
 Visualizing DB results
 ----------------------
@@ -1642,7 +1644,7 @@ Version numbers for all packages used are shown below.
     ## [26] BiocGenerics_0.16.1                     
     ## [27] Rsubread_1.20.2                         
     ## [28] BiocStyle_1.8.0                         
-    ## [29] rmarkdown_0.8.1                         
+    ## [29] rmarkdown_0.9                           
     ## [30] knitr_1.11                              
     ## 
     ## loaded via a namespace (and not attached):
@@ -1688,7 +1690,7 @@ present. In addition,
 *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)*
 is not supported for Windows. However, downstream analyses of the BAM
 files can be performed using any platform on which *R* can be installed.
-The entire workflow takes 3-4 hours to run and requires 10 GB of RAM.
+The entire workflow takes 7-8 hours to run and requires 10 GB of RAM.
 
 Author contributions
 ====================
