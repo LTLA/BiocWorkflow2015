@@ -1137,8 +1137,8 @@ meta <- elementMetadata(out.ranges)
 elementMetadata(out.ranges) <- data.frame(meta, anno)
 ```
 
-The top-ranked DB event will be visualized here.
-This corresponds to a simple DB event, as all windows are changing in the same direction, i.e., up in the WT.
+One of the top-ranked DB regions will be visualized here.
+This corresponds to a simple DB event as all windows are changing in the same direction, i.e., up in the WT.
 The binding region is also quite small relative to some of the H3K9ac examples, consistent with sharp TF binding to a specific recognition site.
 
 ```{r}
