@@ -22,7 +22,7 @@ bibliography: ref.bib
 # Introduction
 
 Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular technique for identifying the genomic binding sites of a target protein.
-Conventional analyses of ChIP-seq data aim to detect absolute binding (i.e., the presence or absence of a binding sites) based on peaks in the read coverage.
+Conventional analyses of ChIP-seq data aim to detect absolute binding (i.e., the presence or absence of a binding site) based on peaks in the read coverage.
 However, a number of recent studies have focused on the detection of changes in the binding profile between conditions [@rossinnes2012differential; @pal2013global].
 These differential binding (DB) analyses involve counting reads into genomic intervals, and then testing those counts for significant differences between conditions.
 This defines a set of putative DB regions for further examination.
@@ -124,8 +124,8 @@ group.fastq <- paste0(names(by.group), ".fastq")
 
 Reads in each library are aligned to the mm10 build of the mouse genome, using the `align` function in the *[Rsubread](http://bioconductor.org/packages/release/bioc/html/Rsubread.html)* package [@liao2013subread].
 This assumes that an index has already been constructed with the prefix `index/mm10`.
-The function uses a seed-and-vote paradigm to quickly and accurately map reads to the genome, by focusing on locations that receive a number of votes above some consensus threshold.
-Here, a threshold of 2 is used instead of the default of 3, to accommodate the shorter length of the reads (32--36 bp).
+The function uses a seed-and-vote paradigm to quickly and accurately map reads to the genome by focusing on locations that receive a number of votes above some consensus threshold.
+Here, a threshold of 2 votes is used instead of the default of 3, to accommodate the short length of the reads (32--36 bp).
 The `type` parameter is also set to optimize for genomic alignment, rather than alignment to the transcriptome.
 
 
@@ -136,7 +136,7 @@ align(index="index/mm10", readfile1=group.fastq, TH1=2, type=1,
     input_format="FASTQ", output_file=bam.files)
 ```
 
-In each of the resulting BAM files, alignments are re-sorted by their mapping location.
+In each of the resulting BAM files, alignments are re-sorted by their mapping locations.
 This is required for input into *[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)*, 
     but is also useful for other programs like genome browsers that depend on sorting and indexing for rapid retrieval of reads.
 
@@ -291,7 +291,7 @@ param <- readParam(minq=50, discard=blacklist, restrict=standard.chr)
 
 ## Computing the average fragment length
 
-Strand bimodality is often observed in ChIP-seq experiments involving sharp binding events like H3K9ac marking.
+Strand bimodality is often observed in ChIP-seq experiments involving narrow binding events like H3K9ac marking.
 This refers to the presence of distinct subpeaks on each strand and can be quantified with cross-correlation plots [@kharchenko2008design].
 A strong peak in the cross-correlations should be observed if immunoprecipitation was successful.
 The delay distance at the peak corresponds to the distance between forward-/reverse-strand subpeaks.
@@ -315,7 +315,7 @@ abline(v=frag.len, col="red")
 text(x=frag.len, y=min(x), paste(frag.len, "bp"), pos=4, col="red")
 ```
 
-![**Figure 1:** Cross-correlation function (CCF) against delay distance for the H3k9ac data set. The delay with the maximum correlation is shown as the red line.](figure/ccfplot-1.png) 
+![**Figure 1:** Cross-correlation function (CCF) against delay distance for the H3k9ac data set. The delay with the maximum correlation is shown as the red line.](figure/ccfplot-1.png)
 
 Only unmarked reads (i.e., not potential PCR duplicates) are used here.
 This tends to give better signal by reducing the size of the "phantom" peak at the read length [@landt2012chipseq].
@@ -400,7 +400,7 @@ threshold <- filter.stat$abundances[1] - filter.stat$filter[1] + log2(min.fc)
 abline(v=threshold, col="red")
 ```
 
-![**Figure 2:** Histogram of average abundances across all 2 kbp genomic bins. The filter threshold is shown as the red line.](figure/bghistplot-1.png) 
+![**Figure 2:** Histogram of average abundances across all 2 kbp genomic bins. The filter threshold is shown as the red line.](figure/bghistplot-1.png)
 
 The actual filtering itself is done by simply subsetting the `RangedSummarizedExperiment` object.
 
@@ -411,7 +411,7 @@ filtered.data <- win.data[keep,]
 
 ## Normalizing for library-specific trended biases
 
-Normalization is required prior to any comparisons between libraries, to eliminate confounding library-specific biases.
+Normalization is required to eliminate confounding library-specific biases prior to any comparisons between libraries.
 In particular, a trended bias is often observed between libraries in Figure 3.
 This refers to a systematic fold-difference in window coverage between libraries that changes according to the average abundance of the window.
 
@@ -424,7 +424,7 @@ smoothScatter(win.ab, logfc, ylim=c(-6, 6), xlim=c(0, 5),
     xlab="Average abundance", ylab="Log-fold change")
 ```
 
-![**Figure 3:** Abundance-dependent trend in the log-fold change between two H3K9ac libraries (mature B over pro-B), across all windows retained after filtering.](figure/trendplot-1.png) 
+![**Figure 3:** Abundance-dependent trend in the log-fold change between two H3K9ac libraries (mature B over pro-B), across all windows retained after filtering.](figure/trendplot-1.png)
 
 Trended biases cannot be removed by scaling methods like TMM normalization [@robinson2010scaling], as the amount of scaling required varies with the abundance of the window.
 Rather, non-linear normalization methods must be used.
@@ -460,7 +460,7 @@ smoothScatter(win.ab, norm.fc, ylim=c(-6, 6), xlim=c(0, 5),
     xlab="Average abundance", ylab="Log-fold change")
 ```
 
-![**Figure 4:** Effect of non-linear normalization on the trended bias between two H3K9ac libraries. Log-fold changes for all windows are shown after normalization.](figure/normplot-1.png) 
+![**Figure 4:** Effect of non-linear normalization on the trended bias between two H3K9ac libraries. Normalized log-fold changes are shown for all windows retained after filtering.](figure/normplot-1.png)
 
 The implicit assumption of non-linear methods is that most windows at each abundance are not DB.
 Any systematic difference between libraries is attributed to bias and is removed.
@@ -532,7 +532,6 @@ summary(y$trended.dispersion)
 ```
 
 The NB dispersion trend is visualized in Figure 5 as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
-A trend that decreases to a plateau with increasing abundance is typical of many analyses, including those of RNA-seq and ChIP-seq data.
 Note that only the trended dispersion will be used in the downstream steps -- the common and tagwise values are only shown for diagnostic purposes.
 Specifically, the common BCV provides an overall measure of the variability in the data set, averaged across all windows.
 Data sets with common BCVs ranging from 10 to 20% are considered to have low variability, i.e., counts are highly reproducible.
@@ -543,7 +542,7 @@ The tagwise BCVs should also be dispersed above and below the fitted trend, indi
 plotBCV(y)
 ```
 
-![**Figure 5:** Abundance-dependent trend in the BCV for each window, represented by the blue line. Common and tagwise estimates are also shown.](figure/bcvplot-1.png) 
+![**Figure 5:** Abundance-dependent trend in the BCV for each window, represented by the blue line. Common (red) and tagwise estimates (black) are also shown.](figure/bcvplot-1.png)
 
 For most data sets, one would expect to see a trend that decreases to a plateau with increasing average abundance. 
 This reflects the greater reliability of large counts, where the effects of stochasticity and technical artifacts (e.g., mapping errors, PCR duplicates) are averaged out.
@@ -565,7 +564,7 @@ fit <- glmQLFit(y, design, robust=TRUE)
 plotQLDisp(fit)
 ```
 
-![**Figure 6:** Effect of EB shrinkage on the raw QL dispersion estimate for each window (black) towards the abundance-dependent trend (blue) to obtain squeezed estimates (red).](figure/qlplot-1.png) 
+![**Figure 6:** Effect of EB shrinkage on the raw QL dispersion estimate for each window (black) towards the abundance-dependent trend (blue) to obtain squeezed estimates (red).](figure/qlplot-1.png)
 
 The extent of shrinkage is determined by the prior degrees of freedom (d.f.).
 Large prior d.f. indicates that the dispersions were similar across windows, such that strong shrinkage to the trend could be performed to increase stability and power.
@@ -580,7 +579,7 @@ summary(fit$df.prior)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.4903 22.6900 22.6900 22.6900 22.6900 22.6900
+##  0.2508 22.6900 22.6900 22.6900 22.6900 22.6900
 ```
 
 ### Examining the data with MDS plots
@@ -597,7 +596,7 @@ plotMDS(norm.adjc, labels=celltype,
     col=c("red", "blue")[as.integer(celltype)])
 ```
 
-![**Figure 7:** MDS plot with two dimensions for all libraries in the H3K9ac data set. Libraries are labelled and coloured according to the cell type.](figure/mdsplot-1.png) 
+![**Figure 7:** MDS plot with two dimensions for all libraries in the H3K9ac data set. Libraries are labelled and coloured according to the cell type.](figure/mdsplot-1.png)
 
 ## Testing for DB and controlling the FDR
 
@@ -605,8 +604,8 @@ plotMDS(norm.adjc, labels=celltype,
 
 Each window is tested for significant differences between cell types using the QL F-test [@lund2012ql].
 This is superior to the likelihood ratio test that is typically used for GLMs, as the QL F-test accounts for the uncertainty in dispersion estimation.
-One *p*-value is produced for each window, representing the evidence against the null hypothesis (i.e., no DB).
-For this analysis, the comparison is parametrized such that the reported log-fold changes represent that of pro-B cells over mature B counterparts.
+One *p*-value is produced for each window, representing the evidence against the null hypothesis (i.e., that no DB is present in the window).
+For this analysis, the comparison is parametrized such that the reported log-fold change for each window represents that of the coverage in pro-B cells over their mature B counterparts.
 
 
 ```r
@@ -821,7 +820,7 @@ elementMetadata(out.ranges) <- data.frame(meta, anno)
 ### Using the *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* package
 
 As its name suggests, the *[ChIPpeakAnno](http://bioconductor.org/packages/release/bioc/html/ChIPpeakAnno.html)* package is designed to annotate peaks from ChIP-seq experiments [@zhu2010chippeakanno].
-A `GRanges` object containing all regions of interest is supplied to the relevant function, after removing all previous metadata fields to reduce clutter.
+A `GRanges` object containing all regions of interest is supplied to the relevant function after removing all previous metadata fields to reduce clutter.
 The gene closest to each region is then reported.
 Gene coordinates are taken from the NCBI mouse 38 annotation, which is roughly equivalent to the annotation in the mm10 genome build.
 
@@ -854,7 +853,7 @@ Another approach to annotation is to flip the problem around, such that DB stati
 This is more convenient when the DB analysis needs to be integrated with, e.g., DE analyses of matching RNA-seq data.
 In the code below, promoter coordinates are obtained by running `detailRanges` without specifying any regions.
 All windows overlapping each promoter are defined as a cluster, and DB statistics are computed as previously described for each cluster/promoter.
-This directly yields results for annotated features (with some `NA` values, representing those promoters that have no overlapping windows).
+This directly yields DB results for annotated features, along with some `NA` values representing promoters that have no overlapping windows (these are filtered out in the code below for demonstration purposes).
 
 
 ```r
@@ -876,7 +875,7 @@ head(data.frame(Gene=promoters$symbol, tabprom)[!is.na(tabprom$PValue),])
 ## 13 Gm15772       30       12          7 0.085543435687 0.1193045223
 ```
 
-Note that this is distinct from counting reads across promoters.
+Note that this strategy is distinct from counting reads across promoters.
 Using promoter-level counts would not provide enough spatial resolution to detect sharp binding events that only occur in a subinterval of the promoter.
 In particular, detection may be compromised by non-specific background or the presence of multiple opposing DB events in the same promoter.
 Combining window-level statistics is preferable as resolution is maintained for optimal performance.
@@ -957,7 +956,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 8:** Coverage tracks for a simple DB event between pro-B and mature B cells, across a broad region in the H3K9ac data set. Read coverage for each library is shown as a per-million value at each base.](figure/simplebroadplot-1.png) 
+![**Figure 8:** Coverage tracks for a simple DB event between pro-B and mature B cells, across a broad region in the H3K9ac data set. Read coverage for each library is shown as a per-million value at each base.](figure/simplebroadplot-1.png)
 
 ### Complex DB across a broad region
 
@@ -1011,14 +1010,14 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 9:** Coverage tracks for a complex DB event in the H3K9ac data set, shown as per-million values.](figure/complexplot-1.png) 
+![**Figure 9:** Coverage tracks for a complex DB event in the H3K9ac data set, shown as per-million values.](figure/complexplot-1.png)
 
 ### Simple DB across a small region
 
 Both of the examples above involve differential marking within broad regions spanning several kilobases.
 This is consistent with changes in the marking profile across a large number of nucleosomes.
 However, H3K9ac marking can also be concentrated into small regions, involving only a few nucleosomes.
-*[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* is equally capable of detecting "sharp" DB within these small regions.
+*[csaw](http://bioconductor.org/packages/release/bioc/html/csaw.html)* is equally capable of detecting sharp DB within these small regions.
 This can be demonstrated by examining those clusters that contain a smaller number of windows.
 
 
@@ -1063,7 +1062,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 10:** Coverage tracks for a sharp and simple DB event in the H3K9ac data set, shown as per-million values.](figure/simplesharpplot-1.png) 
+![**Figure 10:** Coverage tracks for a sharp and simple DB event in the H3K9ac data set, shown as per-million values.](figure/simplesharpplot-1.png)
 
 Note that the window size will determine whether sharp or broad events are preferentially detected.
 Larger windows provide more power to detect broad events (as the counts are higher), while smaller windows provide more resolution to detect sharp events.
@@ -1274,7 +1273,7 @@ smoothScatter(bin.ab, adjc[,3]-adjc[,4], ylim=c(-6, 6),
 abline(h=log2(normfacs[3]/normfacs[4]), col="red")
 ```
 
-![**Figure 11:** Mean-difference plots for the bin counts, comparing library 4 to all other libraries. The red line represents the log-ratio of the normalization factors between libraries.](figure/compoplot-1.png) 
+![**Figure 11:** Mean-difference plots for the bin counts, comparing library 4 to all other libraries. The red line represents the log-ratio of the normalization factors between libraries.](figure/compoplot-1.png)
 
 Note that this normalization strategy is quite different from that in the H3K9ac analysis.
 Here, systematic DB in one direction is expected between conditions, given that CBP function is lost in the KO genotype.
@@ -1372,7 +1371,7 @@ plotMDS(cpm(y, log=TRUE), top=10000, labels=genotype,
     col=c("red", "blue")[as.integer(genotype)])
 ```
 
-![**Figure 12:** MDS plot with two dimensions for all libraries in the CBP data set. Libraries are labelled and coloured according to the genotype. A larger top set of windows was used to improve the visualization of the genome-wide differences between the WT libraries.](figure/mdsplot2-1.png) 
+![**Figure 12:** MDS plot with two dimensions for all libraries in the CBP data set. Libraries are labelled and coloured according to the genotype. A larger top set of windows was used to improve the visualization of the genome-wide differences between the WT libraries.](figure/mdsplot2-1.png)
 
 The presence of a large batch effect between replicates is not ideal.
 Nonetheless, the DB analysis can proceed, albeit with some loss of power due to the inflated NB dispersions.
@@ -1435,8 +1434,8 @@ meta <- elementMetadata(out.ranges)
 elementMetadata(out.ranges) <- data.frame(meta, anno)
 ```
 
-The top-ranked DB event will be visualized here.
-This corresponds to a simple DB event, as all windows are changing in the same direction, i.e., up in the WT.
+One of the top-ranked DB regions will be visualized here.
+This corresponds to a simple DB event as all windows are changing in the same direction, i.e., up in the WT.
 The binding region is also quite small relative to some of the H3K9ac examples, consistent with sharp TF binding to a specific recognition site.
 
 
@@ -1487,7 +1486,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-![**Figure 13:** Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png) 
+![**Figure 13:** Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility).](figure/tfplot-1.png)
 
 Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
 
@@ -1533,66 +1532,66 @@ sessionInfo()
 ##  [8] utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.14.0                             
-##  [2] ChIPpeakAnno_3.4.3                      
+##  [1] Gviz_1.14.4                             
+##  [2] ChIPpeakAnno_3.4.5                      
 ##  [3] VennDiagram_1.6.16                      
 ##  [4] futile.logger_1.4.1                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.22.7                  
+##  [6] GenomicFeatures_1.22.13                 
 ##  [7] org.Mm.eg.db_3.2.3                      
 ##  [8] RSQLite_1.0.0                           
 ##  [9] DBI_0.3.1                               
-## [10] AnnotationDbi_1.32.2                    
+## [10] AnnotationDbi_1.32.3                    
 ## [11] edgeR_3.12.0                            
-## [12] limma_3.26.3                            
+## [12] limma_3.26.8                            
 ## [13] locfit_1.5-9.1                          
-## [14] statmod_1.4.22                          
+## [14] statmod_1.4.24                          
 ## [15] csaw_1.4.1                              
-## [16] SummarizedExperiment_1.0.1              
+## [16] SummarizedExperiment_1.0.2              
 ## [17] Biobase_2.30.0                          
-## [18] rtracklayer_1.30.1                      
+## [18] rtracklayer_1.30.2                      
 ## [19] Rsamtools_1.22.0                        
-## [20] Biostrings_2.38.2                       
+## [20] Biostrings_2.38.4                       
 ## [21] XVector_0.10.0                          
-## [22] GenomicRanges_1.22.2                    
-## [23] GenomeInfoDb_1.6.1                      
-## [24] IRanges_2.4.6                           
-## [25] S4Vectors_0.8.5                         
+## [22] GenomicRanges_1.22.4                    
+## [23] GenomeInfoDb_1.6.3                      
+## [24] IRanges_2.4.8                           
+## [25] S4Vectors_0.8.11                        
 ## [26] BiocGenerics_0.16.1                     
-## [27] Rsubread_1.20.2                         
-## [28] knitr_1.11                              
+## [27] Rsubread_1.20.3                         
+## [28] knitr_1.12.3                            
 ## [29] BiocStyle_1.8.0                         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] httr_1.0.0                   regioneR_1.2.0              
-##  [3] AnnotationHub_2.2.2          splines_3.2.2               
-##  [5] Formula_1.2-1                shiny_0.12.2                
-##  [7] interactiveDisplayBase_1.8.0 latticeExtra_0.6-26         
+##  [1] httr_1.1.0                   regioneR_1.2.3              
+##  [3] AnnotationHub_2.2.5          splines_3.2.2               
+##  [5] Formula_1.2-1                shiny_0.13.1                
+##  [7] interactiveDisplayBase_1.8.0 latticeExtra_0.6-28         
 ##  [9] RBGL_1.46.0                  BSgenome_1.38.0             
 ## [11] lattice_0.20-33              biovizBase_1.18.0           
-## [13] digest_0.6.8                 RColorBrewer_1.1-2          
-## [15] colorspace_1.2-6             htmltools_0.2.6             
+## [13] digest_0.6.9                 RColorBrewer_1.1-2          
+## [15] colorspace_1.2-6             htmltools_0.3               
 ## [17] httpuv_1.3.3                 plyr_1.8.3                  
-## [19] XML_3.98-1.3                 biomaRt_2.26.1              
-## [21] zlibbioc_1.16.0              xtable_1.8-0                
-## [23] GO.db_3.2.2                  scales_0.3.0                
-## [25] BiocParallel_1.4.3           ggplot2_2.0.0               
-## [27] nnet_7.3-11                  survival_2.38-3             
+## [19] XML_3.98-1.4                 biomaRt_2.26.1              
+## [21] zlibbioc_1.16.0              xtable_1.8-2                
+## [23] GO.db_3.2.2                  scales_0.4.0                
+## [25] BiocParallel_1.4.3           ggplot2_2.1.0               
+## [27] nnet_7.3-12                  survival_2.38-3             
 ## [29] magrittr_1.5                 mime_0.4                    
-## [31] memoise_0.2.1                evaluate_0.8                
+## [31] memoise_1.0.0                evaluate_0.8.3              
 ## [33] MASS_7.3-45                  foreign_0.8-66              
 ## [35] graph_1.48.0                 BiocInstaller_1.20.1        
-## [37] tools_3.2.2                  formatR_1.2.1               
+## [37] tools_3.2.2                  formatR_1.3                 
 ## [39] matrixStats_0.50.1           stringr_1.0.0               
-## [41] munsell_0.4.2                cluster_2.0.3               
-## [43] ensembldb_1.2.1              lambda.r_1.1.7              
-## [45] RCurl_1.95-4.7               dichromat_2.0-0             
+## [41] munsell_0.4.3                cluster_2.0.3               
+## [43] ensembldb_1.2.2              lambda.r_1.1.7              
+## [45] RCurl_1.95-4.8               dichromat_2.0-0             
 ## [47] VariantAnnotation_1.16.4     bitops_1.0-6                
-## [49] gtable_0.1.2                 multtest_2.26.0             
-## [51] R6_2.1.1                     gridExtra_2.0.0             
-## [53] GenomicAlignments_1.6.1      Hmisc_3.17-1                
+## [49] gtable_0.2.0                 multtest_2.26.0             
+## [51] R6_2.1.2                     gridExtra_2.2.1             
+## [53] GenomicAlignments_1.6.3      Hmisc_3.17-2                
 ## [55] futile.options_1.0.0         KernSmooth_2.23-15          
-## [57] stringi_1.0-1                Rcpp_0.12.2                 
+## [57] stringi_1.0-1                Rcpp_0.12.3                 
 ## [59] rpart_4.1-10                 acepack_1.3-3.3
 ```
 
