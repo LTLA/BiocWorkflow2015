@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 21 December 2015
+date: 5 May 2016
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -307,7 +307,7 @@ frag.len <- which.max(x) - 1
 frag.len
 ```
 
-```{r ccfplot, fig.cap="Cross-correlation function (CCF) against delay distance for the H3k9ac data set. The delay with the maximum correlation is shown as the red line."}
+```{r ccfplot, fig.cap="Cross-correlation function (CCF) against delay distance for the H3K9ac data set. The delay with the maximum correlation is shown as the red line."}
 plot(1:length(x)-1, x, xlab="Delay (bp)", ylab="CCF", type="l")
 abline(v=frag.len, col="red")
 text(x=frag.len, y=min(x), paste(frag.len, "bp"), pos=4, col="red")
@@ -1143,7 +1143,7 @@ The binding region is also quite small relative to some of the H3K9ac examples, 
 
 ```{r}
 o <- order(out.ranges$PValue)    
-cur.region <- out.ranges[o[1]]
+cur.region <- out.ranges[o[2]]
 cur.region
 ```
 
@@ -1176,7 +1176,7 @@ plotTracks(c(gax, collected, greg), chromosome=as.character(seqnames(cur.region)
     from=start(cur.region), to=end(cur.region))
 ```
 
-Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3k9ac data.
+Note that that the `gax` and `greg` objects are the same as those used in the visualization of the H3K9ac data.
 
 ```{r, eval=!keep.files, echo=FALSE, results="hide"}
 unlink(bam.files)
