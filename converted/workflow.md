@@ -342,12 +342,12 @@ win.data
 ```
 ## class: RangedSummarizedExperiment 
 ## dim: 1576775 4 
-## metadata(4): spacing width shift final.ext
+## metadata(6): spacing width ... param final.ext
 ## assays(1): counts
 ## rownames: NULL
 ## rowData names(0):
 ## colnames: NULL
-## colData names(5): bam.files totals ext rlen param
+## colData names(4): bam.files totals ext rlen
 ```
 
 To analyze H3K9ac data, a window size of 150 bp is used here.
@@ -867,12 +867,12 @@ head(data.frame(Gene=promoters$symbol, tabprom)[!is.na(tabprom$PValue),])
 
 ```
 ##       Gene nWindows logFC.up logFC.down         PValue          FDR
-## 6  Ldlrap1       19       11          0 0.297541355384 0.3452365991
-## 7     Mdn1       29       12         11 0.000004477042 0.0001345612
-## 8    Pydc3        8        0          6 0.051913378738 0.0788104755
-## 9   Wfdc17        6        0          6 0.000069412387 0.0008679998
-## 10  Mfap1b       19        2         10 0.108122626016 0.1448566735
-## 13 Gm15772       30       12          6 0.073759534036 0.1050042490
+## 6  Ldlrap1       19       11          0 0.297541355384 0.3452690376
+## 7     Mdn1       29       12         11 0.000004477042 0.0001344699
+## 8   Ifi208        8        0          6 0.051913378738 0.0788457107
+## 9   Wfdc17        6        0          6 0.000069412387 0.0008659623
+## 10  Mfap1b       19        2         10 0.108122626016 0.1448962877
+## 13 Gm15772       30       12          6 0.073759534036 0.1050351880
 ```
 
 Note that this strategy is distinct from counting reads across promoters.
@@ -1213,12 +1213,12 @@ win.data
 ```
 ## class: RangedSummarizedExperiment 
 ## dim: 9127697 4 
-## metadata(4): spacing width shift final.ext
+## metadata(6): spacing width ... param final.ext
 ## assays(1): counts
 ## rownames: NULL
 ## rowData names(0):
 ## colnames: NULL
-## colData names(5): bam.files totals ext rlen param
+## colData names(4): bam.files totals ext rlen
 ```
 
 The default spacing of 50 bp is also used here.
@@ -1515,7 +1515,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.3.0 Patched (2016-05-03 r70577)
+## R version 3.3.1 Patched (2016-08-08 r71066)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: CentOS release 6.4 (Final)
 ## 
@@ -1528,74 +1528,74 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-##  [1] grid      parallel  stats4    methods   stats     graphics  grDevices
-##  [8] utils     datasets  base     
+##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.15.7                             
-##  [2] ChIPpeakAnno_3.6.0                      
+##  [1] Gviz_1.17.7                             
+##  [2] ChIPpeakAnno_3.7.9                      
 ##  [3] VennDiagram_1.6.17                      
-##  [4] futile.logger_1.4.1                     
-##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-##  [6] GenomicFeatures_1.23.31                 
-##  [7] org.Mm.eg.db_3.3.0                      
-##  [8] AnnotationDbi_1.34.0                    
-##  [9] edgeR_3.14.0                            
-## [10] limma_3.28.0                            
+##  [4] futile.logger_1.4.3                     
+##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.4.0
+##  [6] GenomicFeatures_1.25.20                 
+##  [7] org.Mm.eg.db_3.4.0                      
+##  [8] AnnotationDbi_1.35.5                    
+##  [9] edgeR_3.15.6                            
+## [10] limma_3.29.22                           
 ## [11] locfit_1.5-9.1                          
-## [12] statmod_1.4.24                          
-## [13] csaw_1.6.0                              
-## [14] SummarizedExperiment_1.2.0              
-## [15] Biobase_2.32.0                          
-## [16] rtracklayer_1.32.0                      
-## [17] Rsamtools_1.24.0                        
-## [18] Biostrings_2.40.0                       
-## [19] XVector_0.12.0                          
-## [20] GenomicRanges_1.24.0                    
-## [21] GenomeInfoDb_1.8.0                      
-## [22] IRanges_2.6.0                           
-## [23] S4Vectors_0.10.0                        
-## [24] BiocGenerics_0.18.0                     
-## [25] Rsubread_1.22.0                         
-## [26] knitr_1.12.3                            
-## [27] BiocStyle_2.0.0                         
+## [12] statmod_1.4.26                          
+## [13] csaw_1.7.4                              
+## [14] BiocParallel_1.7.9                      
+## [15] SummarizedExperiment_1.3.82             
+## [16] Biobase_2.33.4                          
+## [17] rtracklayer_1.33.12                     
+## [18] Rsamtools_1.25.2                        
+## [19] Biostrings_2.41.4                       
+## [20] XVector_0.13.7                          
+## [21] GenomicRanges_1.25.94                   
+## [22] GenomeInfoDb_1.9.15                     
+## [23] IRanges_2.7.17                          
+## [24] S4Vectors_0.11.19                       
+## [25] BiocGenerics_0.19.2                     
+## [26] Rsubread_1.23.8                         
+## [27] knitr_1.14                              
+## [28] BiocStyle_2.1.34                        
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] bitops_1.0-6                  matrixStats_0.50.2           
-##  [3] RColorBrewer_1.1-2            httr_1.1.0                   
-##  [5] tools_3.3.0                   R6_2.1.2                     
+##  [1] bitops_1.0-6                  matrixStats_0.51.0           
+##  [3] RColorBrewer_1.1-2            httr_1.2.1                   
+##  [5] tools_3.3.1                   R6_2.2.0                     
 ##  [7] rpart_4.1-10                  KernSmooth_2.23-15           
-##  [9] Hmisc_3.17-4                  DBI_0.4                      
-## [11] colorspace_1.2-6              ade4_1.7-4                   
+##  [9] Hmisc_3.17-4                  DBI_0.5-1                    
+## [11] colorspace_1.2-7              ade4_1.7-4                   
 ## [13] nnet_7.3-12                   gridExtra_2.2.1              
-## [15] chron_2.3-47                  graph_1.50.0                 
-## [17] formatR_1.3                   scales_0.4.0                 
-## [19] RBGL_1.48.0                   stringr_1.0.0                
-## [21] digest_0.6.9                  foreign_0.8-66               
+## [15] chron_2.3-47                  graph_1.51.0                 
+## [17] formatR_1.4                   scales_0.4.0                 
+## [19] RBGL_1.49.3                   stringr_1.1.0                
+## [21] digest_0.6.10                 foreign_0.8-67               
 ## [23] dichromat_2.0-0               htmltools_0.3.5              
-## [25] ensembldb_1.4.0               BSgenome_1.40.0              
-## [27] regioneR_1.4.0                RSQLite_1.0.0                
-## [29] BiocInstaller_1.22.1          shiny_0.13.2                 
-## [31] BiocParallel_1.6.0            acepack_1.3-3.3              
-## [33] VariantAnnotation_1.18.0      RCurl_1.95-4.8               
-## [35] magrittr_1.5                  GO.db_3.3.0                  
-## [37] Formula_1.2-1                 Matrix_1.2-6                 
-## [39] Rcpp_0.12.4.5                 munsell_0.4.3                
-## [41] stringi_1.0-1                 MASS_7.3-45                  
-## [43] zlibbioc_1.18.0               plyr_1.8.3                   
-## [45] AnnotationHub_2.4.0           lattice_0.20-33              
-## [47] splines_3.3.0                 multtest_2.28.0              
-## [49] seqinr_3.1-3                  biomaRt_2.27.2               
-## [51] futile.options_1.0.0          XML_3.98-1.4                 
-## [53] evaluate_0.9                  biovizBase_1.20.0            
-## [55] latticeExtra_0.6-28           lambda.r_1.1.7               
-## [57] data.table_1.9.6              idr_1.2                      
-## [59] httpuv_1.3.3                  gtable_0.2.0                 
-## [61] ggplot2_2.1.0                 mime_0.4                     
-## [63] xtable_1.8-2                  survival_2.39-2              
-## [65] GenomicAlignments_1.8.0       memoise_1.0.0                
-## [67] cluster_2.0.4                 Rhtslib_1.4.0                
-## [69] interactiveDisplayBase_1.10.0
+## [25] ensembldb_1.5.14              BSgenome_1.41.2              
+## [27] regioneR_1.5.2                RSQLite_1.0.0                
+## [29] BiocInstaller_1.23.9          shiny_0.14.1                 
+## [31] acepack_1.3-3.3               VariantAnnotation_1.19.12    
+## [33] RCurl_1.95-4.8                magrittr_1.5                 
+## [35] GO.db_3.4.0                   Formula_1.2-1                
+## [37] Matrix_1.2-7.1                Rcpp_0.12.7                  
+## [39] munsell_0.4.3                 stringi_1.1.2                
+## [41] MASS_7.3-45                   zlibbioc_1.19.0              
+## [43] plyr_1.8.4                    AnnotationHub_2.5.14         
+## [45] lattice_0.20-34               splines_3.3.1                
+## [47] multtest_2.29.0               seqinr_3.3-3                 
+## [49] biomaRt_2.29.2                futile.options_1.0.0         
+## [51] XML_3.98-1.4                  evaluate_0.10                
+## [53] biovizBase_1.21.0             latticeExtra_0.6-28          
+## [55] data.table_1.9.6              lambda.r_1.1.9               
+## [57] idr_1.2                       httpuv_1.3.3                 
+## [59] gtable_0.2.0                  ggplot2_2.1.0                
+## [61] mime_0.5                      xtable_1.8-2                 
+## [63] survival_2.39-5               GenomicAlignments_1.9.6      
+## [65] memoise_1.0.0                 cluster_2.0.5                
+## [67] Rhtslib_1.5.4                 interactiveDisplayBase_1.11.3
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
