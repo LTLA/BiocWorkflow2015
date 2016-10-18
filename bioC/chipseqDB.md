@@ -1,3 +1,12 @@
+# From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data
+{:.no_toc}
+
+<p class="author-name">Aaron T. L. Lun, Gordon K. Smyth</p>
+<p class="author-affiliation">The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia</p>
+
+## Contents
+{:.no_toc}
+
 -   [Introduction](#introduction)
 -   [Aligning reads in the H3K9ac
     libraries](#aligning-reads-in-the-h3k9ac-libraries)
@@ -74,6 +83,7 @@
 -   [Grant information](#grant-information)
 -   [Acknowledgements](#acknowledgements)
 -   [References](#references)
+{:toc}
 
 <style>
 pre, img {
@@ -81,8 +91,8 @@ pre, img {
   display: block;
 }
 </style>
-Introduction
-============
+
+## Introduction
 
 Chromatin immunoprecipitation with sequencing (ChIP-seq) is a popular
 technique for identifying the genomic binding sites of a target protein.
@@ -164,8 +174,7 @@ parameter settings. The intention is to provide readers with a variety
 of usage examples from which they can construct DB analyses of their own
 data.
 
-Aligning reads in the H3K9ac libraries
-======================================
+## Aligning reads in the H3K9ac libraries
 
 The first task is to download the relevant ChIP-seq libraries from the
 NCBI Gene Expression Omnibus (GEO) (Edgar, Domrachev, and Lash 2002).
@@ -299,8 +308,7 @@ the BAM files.
 
     indexBam(bam.files)
 
-Obtaining the ENCODE blacklist for mm10
-=======================================
+## Obtaining the ENCODE blacklist for mm10
 
 A number of genomic regions contain high artifactual signal in ChIP-seq
 experiments. These often correspond to genomic features like telomeres
@@ -349,11 +357,9 @@ identify problematic regions with the
 These regions should be ignored as they have high coverage in the
 controls and are unlikely to be genuine binding sites.
 
-Testing for DB between pro-B and mature B cells
-===============================================
+## Testing for DB between pro-B and mature B cells
 
-Setting up the analysis parameters
-----------------------------------
+### Setting up the analysis parameters
 
 Here, the settings for the DB analysis are specified. Recall that the
 paths to the BAM files are stored in the `bam.files` vector after
@@ -384,8 +390,7 @@ nuclear chromosomes.
     standard.chr <- paste0("chr", c(1:19, "X", "Y"))
     param <- readParam(minq=50, discard=blacklist, restrict=standard.chr)
 
-Computing the average fragment length
--------------------------------------
+### Computing the average fragment length
 
 Strand bimodality is often observed in ChIP-seq experiments involving
 narrow binding events like H3K9ac marking. This refers to the presence
@@ -421,8 +426,7 @@ sizes. Thus, the marking status of each read will be ignored in the rest
 of the analysis, i.e., no duplicates will be removed in downstream
 steps.
 
-Counting reads into windows
----------------------------
+### Counting reads into windows
 
 *[csaw](http://bioconductor.org/packages/csaw)* uses a sliding window
 strategy to quantify binding intensity across the genome. Each read is
@@ -443,12 +447,12 @@ a library.
 
     ## class: RangedSummarizedExperiment 
     ## dim: 1576775 4 
-    ## metadata(4): spacing width shift final.ext
+    ## metadata(6): spacing width ... param final.ext
     ## assays(1): counts
     ## rownames: NULL
     ## rowData names(0):
     ## colnames: NULL
-    ## colData names(5): bam.files totals ext rlen param
+    ## colData names(4): bam.files totals ext rlen
 
 To analyze H3K9ac data, a window size of 150 bp is used here. This
 corresponds roughly to the length of the DNA in a nucleosome (Humburg et
@@ -464,8 +468,7 @@ low counts (by default, less than a sum of 10 across all libraries) are
 removed to reduce memory usage. This represents a preliminary filter to
 remove uninteresting windows corresponding to likely background regions.
 
-Filtering windows by abundance
-------------------------------
+### Filtering windows by abundance
 
 As previously mentioned, low-abundance windows contain no binding sites
 and need to be filtered out. This improves power by removing irrelevant
@@ -517,8 +520,7 @@ The actual filtering itself is done by simply subsetting the
 
     filtered.data <- win.data[keep,]
 
-Normalizing for library-specific trended biases
------------------------------------------------
+### Normalizing for library-specific trended biases
 
 Normalization is required to eliminate confounding library-specific
 biases prior to any comparisons between libraries. In particular, a
@@ -584,10 +586,9 @@ difference would result in loss of genuine DB. An alternative
 normalization strategy for these situations will be described later in
 the CBP analysis.
 
-Statistical modelling of biological variability
------------------------------------------------
+### Statistical modelling of biological variability
 
-### Introduction
+#### Introduction
 
 Counts are modelled using NB GLMs in the
 *[edgeR](http://bioconductor.org/packages/edgeR)* package (McCarthy,
@@ -621,7 +622,7 @@ technical artifacts such as PCR duplicates. Obviously, more replicates
 will provide more power to detect DB accurately and reliability, albeit
 at the cost of time and experimental resources.
 
-### Estimating the NB dispersion
+#### Estimating the NB dispersion
 
 The `RangedSummarizedExperiment` object is coerced into a `DGEList`
 object (plus offsets) prior to entry into
@@ -665,7 +666,7 @@ the plateau has already been reached. This is still a satisfactory
 result, as it indicates that the retained windows have low variability
 and more power to detect DB.
 
-### Estimating the QL dispersion
+#### Estimating the QL dispersion
 
 Additional modelling is provided with the QL methods in
 *[edgeR](http://bioconductor.org/packages/edgeR)* (Lund et al. 2012).
@@ -702,7 +703,7 @@ to outlier windows.
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##  0.2507 22.8700 22.8700 22.8700 22.8700 22.8700
 
-### Examining the data with MDS plots
+#### Examining the data with MDS plots
 
 Multi-dimensional scaling (MDS) plots can be used to examine the
 similarities between libraries. The distance between a pair of libraries
@@ -720,10 +721,9 @@ likely to be present between cell types in this data set.
 H3K9ac data set. Libraries are labelled and coloured according to the
 cell type.](chipseq_db_files/figure-markdown_strict/mdsplot-1.png)
 
-Testing for DB and controlling the FDR
---------------------------------------
+### Testing for DB and controlling the FDR
 
-### Testing for DB with QL F-tests
+#### Testing for DB with QL F-tests
 
 Each window is tested for significant differences between cell types
 using the QL F-test (Lund et al. 2012). This is superior to the
@@ -747,7 +747,7 @@ over their mature B counterparts.
     ## 5 0.9766762 0.9969269 2.0632333 0.16335027
     ## 6 0.4456889 1.2882787 0.5381850 0.47004535
 
-### Controlling the FDR across regions
+#### Controlling the FDR across regions
 
 One might attempt to control the FDR by applying the Benjamini-Hochberg
 (BH) method to the window-level *p*-values (Benjamini and Hochberg
@@ -795,7 +795,7 @@ number of windows with a log-fold change above 0.5 or below -0.5 in each
 cluster, respectively. This can be used to determine the direction of DB
 in each cluster.
 
-### Examining the scope and direction of DB
+#### Examining the scope and direction of DB
 
 The total number of DB regions at a FDR of 5% can be easily calculated.
 
@@ -837,8 +837,7 @@ a summary of the direction of DB across all clusters/regions.
     ##    Mode   FALSE    TRUE    NA's 
     ## logical    8146    5315       0
 
-Saving results to file
-----------------------
+### Saving results to file
 
 Results can be saved to file prior to further manipulation. One approach
 is to store all statistics in the metadata of a `GRanges` object. This
@@ -871,13 +870,11 @@ easily recovered.
 
     save(file="h3k9ac_objects.Rda", win.data, bins, y)
 
-Interpreting the DB results
-===========================
+## Interpreting the DB results
 
-Adding gene-centric annotation
-------------------------------
+### Adding gene-centric annotation
 
-### Using the `detailRanges` function
+#### Using the `detailRanges` function
 
 *[csaw](http://bioconductor.org/packages/csaw)* provides its own
 annotation function, `detailRanges`. This identifies all genic features
@@ -921,7 +918,7 @@ neighbouring each region.
     meta <- elementMetadata(out.ranges) 
     elementMetadata(out.ranges) <- data.frame(meta, anno)
 
-### Using the *[ChIPpeakAnno](http://bioconductor.org/packages/ChIPpeakAnno)* package
+#### Using the *[ChIPpeakAnno](http://bioconductor.org/packages/ChIPpeakAnno)* package
 
 As its name suggests, the
 *[ChIPpeakAnno](http://bioconductor.org/packages/ChIPpeakAnno)* package
@@ -957,7 +954,7 @@ convenient for direct annotation of a DB list, while the
 `annotatePeakInBatch` output contains more information and is more
 convenient for further manipulation.
 
-### Reporting gene-based results
+#### Reporting gene-based results
 
 Another approach to annotation is to flip the problem around, such that
 DB statistics are reported directly for features of interest like genes.
@@ -979,12 +976,12 @@ below for demonstration purposes).
     head(data.frame(Gene=promoters$symbol, tabprom)[!is.na(tabprom$PValue),])
 
     ##       Gene nWindows logFC.up logFC.down         PValue          FDR
-    ## 6  Ldlrap1       19       11          0 0.297541355384 0.3452365991
-    ## 7     Mdn1       29       12         11 0.000004477042 0.0001345612
-    ## 8    Pydc3        8        0          6 0.051913378738 0.0788104755
-    ## 9   Wfdc17        6        0          6 0.000069412387 0.0008679998
-    ## 10  Mfap1b       19        2         10 0.108122626016 0.1448566735
-    ## 13 Gm15772       30       12          6 0.073759534036 0.1050042490
+    ## 6  Ldlrap1       19       11          0 0.297541355384 0.3452690376
+    ## 7     Mdn1       29       12         11 0.000004477042 0.0001344699
+    ## 8   Ifi208        8        0          6 0.051913378738 0.0788457107
+    ## 9   Wfdc17        6        0          6 0.000069412387 0.0008659623
+    ## 10  Mfap1b       19        2         10 0.108122626016 0.1448962877
+    ## 13 Gm15772       30       12          6 0.073759534036 0.1050351880
 
 Note that this strategy is distinct from counting reads across
 promoters. Using promoter-level counts would not provide enough spatial
@@ -994,10 +991,9 @@ by non-specific background or the presence of multiple opposing DB
 events in the same promoter. Combining window-level statistics is
 preferable as resolution is maintained for optimal performance.
 
-Visualizing DB results
-----------------------
+### Visualizing DB results
 
-### Overview
+#### Overview
 
 Here, the *[Gviz](http://bioconductor.org/packages/Gviz)* package is
 used to visualize read coverage across the data set at regions of
@@ -1016,7 +1012,7 @@ reading.
         "ENTREZID", multiVals = "first"))
     symbol(greg) <- symbols[gene(greg)]
 
-### Simple DB across a broad region
+#### Simple DB across a broad region
 
 To begin with, the top-ranking DB region will be visualized. This
 represents a simple DB event where the entire region changes in one
@@ -1068,7 +1064,7 @@ mature B cells, across a broad region in the H3K9ac data set. Read
 coverage for each library is shown as a per-million value at each
 base.](chipseq_db_files/figure-markdown_strict/simplebroadplot-1.png)
 
-### Complex DB across a broad region
+#### Complex DB across a broad region
 
 Complex DB refers to situations where multiple DB events are occurring
 within the same enriched region. These are identified as those clusters
@@ -1119,7 +1115,7 @@ the entire region.
 data set, shown as per-million
 values.](chipseq_db_files/figure-markdown_strict/complexplot-1.png)
 
-### Simple DB across a small region
+#### Simple DB across a small region
 
 Both of the examples above involve differential marking within broad
 regions spanning several kilobases. This is consistent with changes in
@@ -1180,11 +1176,9 @@ larger windows, detection may be confounded by other events within the
 window that distort the log-fold change in the counts between
 conditions.
 
-Repeating the analysis for the CBP data
-=======================================
+## Repeating the analysis for the CBP data
 
-Overview
---------
+### Overview
 
 A window-based DB analysis will be shown for transcription factor (TF)
 data, to complement the histone mark analysis above. This data set
@@ -1195,8 +1189,7 @@ packages to identify DB sites between genotypes. Most, if not all, of
 these sites should be increased in the WT, given that protein function
 should be compromised in the KO.
 
-Aligning reads from CBP libraries
----------------------------------
+### Aligning reads from CBP libraries
 
 Libraries are downloaded from the NCBI GEO data series GSE54453, using
 the SRA accessions listed below. The data set contains two biological
@@ -1261,10 +1254,9 @@ used for the H3K9ac analysis.
     ## SRR1145789.bam 34476967 28830024 2678297    83.62111    9.289958
     ## SRR1145790.bam 32624587 27067108 2912659    82.96537   10.760880
 
-Detecting DB between genotypes for CBP
---------------------------------------
+### Detecting DB between genotypes for CBP
 
-### Counting reads into windows
+#### Counting reads into windows
 
 First, a `readParam` object is constructed to standardize the parameter
 settings in this analysis. The ENCODE blacklist is again used to remove
@@ -1299,12 +1291,12 @@ regions. In this case, a window size of 10 bp is used.
 
     ## class: RangedSummarizedExperiment 
     ## dim: 9127697 4 
-    ## metadata(4): spacing width shift final.ext
+    ## metadata(6): spacing width ... param final.ext
     ## assays(1): counts
     ## rownames: NULL
     ## rowData names(0):
     ## colnames: NULL
-    ## colData names(5): bam.files totals ext rlen param
+    ## colData names(4): bam.files totals ext rlen
 
 The default spacing of 50 bp is also used here. This may seem
 inappropriate, given that the windows are only 10 bp. However, reads
@@ -1314,7 +1306,7 @@ into several windows. This is because reads are extended to the value of
 smaller spacings can be used but will provide little benefit, given that
 each extended read already overlaps multiple windows.
 
-### Normalization for composition biases
+#### Normalization for composition biases
 
 Composition biases are introduced when the amount of DB in each
 condition is unbalanced (Robinson and Oshlack 2010; Lun and Smyth 2014).
@@ -1371,7 +1363,7 @@ non-linear normalization of the H3K9ac data) is not valid. No such
 assumption is made by the binned-TMM approach described above, which
 makes it more appropriate for use in the CBP analysis.
 
-### Filtering of low-abundance windows
+#### Filtering of low-abundance windows
 
 Removal of low-abundance windows is performed as previously described.
 The majority of windows in background regions are filtered out upon
@@ -1399,7 +1391,7 @@ smaller bins provide greater spatial resolution, this is irrelevant for
 quantifying coverage in large background regions that span most of the
 genome.
 
-### Statistical modelling of biological variability
+#### Statistical modelling of biological variability
 
 Counts for each window are modelled using
 *[edgeR](http://bioconductor.org/packages/edgeR)* as previously
@@ -1460,7 +1452,7 @@ The presence of a large batch effect between replicates is not ideal.
 Nonetheless, the DB analysis can proceed, albeit with some loss of power
 due to the inflated NB dispersions.
 
-### Testing for DB
+#### Testing for DB
 
 DB windows are identified using the QL F-test. Windows are clustered
 into regions, and the region-level FDR is controlled using Simes'
@@ -1495,8 +1487,7 @@ are also saved for convenience.
     saveRDS(file="cbp_results.rds", out.ranges)
     save(file="cbp_objects.Rda", win.data, bins, y)
 
-Annotation and visualization
-----------------------------
+### Annotation and visualization
 
 Annotation is added using the `detailRanges` function, as previously
 described.
@@ -1563,8 +1554,7 @@ visibility).](chipseq_db_files/figure-markdown_strict/tfplot-1.png)
 Note that that the `gax` and `greg` objects are the same as those used
 in the visualization of the H3K9ac data.
 
-Summary
-=======
+## Summary
 
 This workflow describes the steps of a window-based DB analysis, from
 read alignment through to visualization of DB regions. All steps are
@@ -1577,8 +1567,7 @@ for histone mark and TF data sets, with differences in parametrization
 that are appropriate to each data type. Readers are encouraged to apply
 the concepts and code presented in this article to their own data.
 
-Software availability
-=====================
+## Software availability
 
 This workflow depends on various packages from version 3.2 of the
 Bioconductor project, running on *R* version 3.2.2 or higher. It
@@ -1597,7 +1586,7 @@ Version numbers for all packages used are shown below.
 
     sessionInfo()
 
-    ## R version 3.3.0 (2016-05-03)
+    ## R version 3.3.1 (2016-06-21)
     ## Platform: x86_64-pc-linux-gnu (64-bit)
     ## Running under: Ubuntu 14.04.3 LTS
     ## 
@@ -1610,75 +1599,76 @@ Version numbers for all packages used are shown below.
     ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
     ## 
     ## attached base packages:
-    ##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
+    ##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
     ##  [8] datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] Gviz_1.16.1                             
-    ##  [2] ChIPpeakAnno_3.6.4                      
+    ##  [1] Gviz_1.17.7                             
+    ##  [2] ChIPpeakAnno_3.7.9                      
     ##  [3] VennDiagram_1.6.17                      
-    ##  [4] futile.logger_1.4.1                     
-    ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.2.2
-    ##  [6] GenomicFeatures_1.24.2                  
-    ##  [7] org.Mm.eg.db_3.3.0                      
-    ##  [8] AnnotationDbi_1.34.3                    
-    ##  [9] edgeR_3.14.0                            
-    ## [10] limma_3.28.5                            
+    ##  [4] futile.logger_1.4.3                     
+    ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.4.0
+    ##  [6] GenomicFeatures_1.25.20                 
+    ##  [7] org.Mm.eg.db_3.4.0                      
+    ##  [8] AnnotationDbi_1.35.4                    
+    ##  [9] edgeR_3.15.6                            
+    ## [10] limma_3.29.21                           
     ## [11] locfit_1.5-9.1                          
-    ## [12] statmod_1.4.24                          
-    ## [13] csaw_1.6.1                              
-    ## [14] SummarizedExperiment_1.2.2              
-    ## [15] Biobase_2.32.0                          
-    ## [16] rtracklayer_1.32.0                      
-    ## [17] Rsamtools_1.24.0                        
-    ## [18] Biostrings_2.40.1                       
-    ## [19] XVector_0.12.0                          
-    ## [20] GenomicRanges_1.24.0                    
-    ## [21] GenomeInfoDb_1.8.1                      
-    ## [22] IRanges_2.6.0                           
-    ## [23] S4Vectors_0.10.1                        
-    ## [24] BiocGenerics_0.18.0                     
-    ## [25] Rsubread_1.22.1                         
-    ## [26] BiocStyle_2.1.3                         
-    ## [27] rmarkdown_0.9.6                         
-    ## [28] knitr_1.13                              
+    ## [12] statmod_1.4.26                          
+    ## [13] csaw_1.7.4                              
+    ## [14] BiocParallel_1.7.8                      
+    ## [15] SummarizedExperiment_1.3.82             
+    ## [16] Biobase_2.33.4                          
+    ## [17] rtracklayer_1.33.12                     
+    ## [18] Rsamtools_1.25.2                        
+    ## [19] Biostrings_2.41.4                       
+    ## [20] XVector_0.13.7                          
+    ## [21] GenomicRanges_1.25.94                   
+    ## [22] GenomeInfoDb_1.9.14                     
+    ## [23] IRanges_2.7.17                          
+    ## [24] S4Vectors_0.11.18                       
+    ## [25] BiocGenerics_0.19.2                     
+    ## [26] Rsubread_1.23.4                         
+    ## [27] BiocStyle_2.1.33                        
+    ## [28] rmarkdown_1.0                           
+    ## [29] knitr_1.14                              
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] bitops_1.0-6                  matrixStats_0.50.2           
-    ##  [3] RColorBrewer_1.1-2            httr_1.1.0                   
-    ##  [5] tools_3.3.0                   R6_2.1.2                     
+    ##  [3] RColorBrewer_1.1-2            httr_1.2.1                   
+    ##  [5] tools_3.3.1                   R6_2.2.0                     
     ##  [7] rpart_4.1-10                  KernSmooth_2.23-15           
-    ##  [9] Hmisc_3.17-4                  DBI_0.4-1                    
+    ##  [9] Hmisc_3.17-4                  DBI_0.5-1                    
     ## [11] colorspace_1.2-6              nnet_7.3-12                  
     ## [13] ade4_1.7-4                    gridExtra_2.2.1              
-    ## [15] chron_2.3-47                  graph_1.50.0                 
+    ## [15] chron_2.3-47                  graph_1.51.0                 
     ## [17] formatR_1.4                   scales_0.4.0                 
-    ## [19] RBGL_1.48.1                   stringr_1.0.0                
-    ## [21] digest_0.6.9                  foreign_0.8-66               
+    ## [19] RBGL_1.49.3                   stringr_1.1.0                
+    ## [21] digest_0.6.10                 foreign_0.8-66               
     ## [23] dichromat_2.0-0               htmltools_0.3.5              
-    ## [25] ensembldb_1.4.3               BSgenome_1.40.0              
-    ## [27] regioneR_1.4.2                RSQLite_1.0.0                
-    ## [29] BiocInstaller_1.22.2          shiny_0.13.2                 
-    ## [31] BiocParallel_1.6.2            acepack_1.3-3.3              
-    ## [33] VariantAnnotation_1.18.1      RCurl_1.95-4.8               
-    ## [35] magrittr_1.5                  GO.db_3.3.0                  
-    ## [37] Formula_1.2-1                 Matrix_1.2-6                 
-    ## [39] Rcpp_0.12.5                   munsell_0.4.3                
-    ## [41] stringi_1.1.1                 yaml_2.1.13                  
-    ## [43] MASS_7.3-45                   zlibbioc_1.18.0              
-    ## [45] plyr_1.8.3                    AnnotationHub_2.4.2          
-    ## [47] lattice_0.20-33               splines_3.3.0                
-    ## [49] multtest_2.28.0               seqinr_3.1-3                 
-    ## [51] biomaRt_2.28.0                futile.options_1.0.0         
-    ## [53] XML_3.98-1.4                  evaluate_0.9                 
-    ## [55] biovizBase_1.20.0             latticeExtra_0.6-28          
-    ## [57] data.table_1.9.6              lambda.r_1.1.7               
-    ## [59] idr_1.2                       httpuv_1.3.3                 
-    ## [61] gtable_0.2.0                  ggplot2_2.1.0                
-    ## [63] mime_0.4                      xtable_1.8-2                 
-    ## [65] survival_2.39-4               GenomicAlignments_1.8.0      
-    ## [67] memoise_1.0.0                 cluster_2.0.4                
-    ## [69] Rhtslib_1.4.3                 interactiveDisplayBase_1.10.3
+    ## [25] ensembldb_1.5.14              BSgenome_1.41.2              
+    ## [27] regioneR_1.5.2                RSQLite_1.0.0                
+    ## [29] BiocInstaller_1.23.9          shiny_0.14.1                 
+    ## [31] acepack_1.3-3.3               VariantAnnotation_1.19.11    
+    ## [33] RCurl_1.95-4.8                magrittr_1.5                 
+    ## [35] GO.db_3.4.0                   Formula_1.2-1                
+    ## [37] Matrix_1.2-6                  Rcpp_0.12.7                  
+    ## [39] munsell_0.4.3                 stringi_1.1.2                
+    ## [41] yaml_2.1.13                   MASS_7.3-45                  
+    ## [43] zlibbioc_1.19.0               plyr_1.8.4                   
+    ## [45] AnnotationHub_2.5.12          lattice_0.20-34              
+    ## [47] splines_3.3.1                 multtest_2.29.0              
+    ## [49] seqinr_3.3-1                  biomaRt_2.29.2               
+    ## [51] futile.options_1.0.0          XML_3.98-1.4                 
+    ## [53] evaluate_0.9                  biovizBase_1.21.0            
+    ## [55] latticeExtra_0.6-28           data.table_1.9.6             
+    ## [57] lambda.r_1.1.9                idr_1.2                      
+    ## [59] httpuv_1.3.3                  gtable_0.2.0                 
+    ## [61] ggplot2_2.1.0                 mime_0.5                     
+    ## [63] xtable_1.8-2                  survival_2.39-5              
+    ## [65] GenomicAlignments_1.9.6       memoise_1.0.0                
+    ## [67] cluster_2.0.4                 Rhtslib_1.5.4                
+    ## [69] interactiveDisplayBase_1.11.3
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2)
 from the SRA Toolkit must be installed on the system, along with the
@@ -1692,33 +1682,28 @@ for Windows. However, downstream analyses of the BAM files can be
 performed using any platform on which *R* can be installed. The entire
 workflow takes 7-8 hours to run and requires 10 GB of RAM.
 
-Author contributions
-====================
+## Author contributions
 
 A.T.T.L. developed and tested the workflow on the H3K9ac and CBP data
 sets. G.K.S. provided direction on the design of the workflow. Both
 A.T.T.L. and G.K.S. wrote the article.
 
-Competing interests
-===================
+## Competing interests
 
 No competing interests were disclosed.
 
-Grant information
-=================
+## Grant information
 
 National Health and Medical Research Council (Program Grant 1054618 to
 G.K.S., Fellowship to G.K.S.); Victorian State Government Operational
 Infrastructure Support; Australian Government NHMRC IRIIS.
 
-Acknowledgements
-================
+## Acknowledgements
 
 The authors would like to thank Prof. Stephen Nutt for his valuable
 insights on B-cell biology.
 
-References
-==========
+## References
 
 Ballman, K. V., D. E. Grill, A. L. Oberg, and T. M. Therneau. 2004.
 “Faster cyclic loess: normalizing RNA arrays via linear models.”
