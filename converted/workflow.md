@@ -300,7 +300,7 @@ This is identified from Figure 1 and is used as the average fragment length for 
 
 ```r
 x <- correlateReads(bam.files, param=reform(param, dedup=TRUE))
-frag.len <- which.max(x) - 1
+frag.len <- maximizeCcf(x)
 frag.len
 ```
 
@@ -1191,7 +1191,7 @@ The average fragment length is estimated by maximizing the cross-correlation fun
 
 ```r
 x <- correlateReads(bam.files, param=reform(param, dedup=TRUE))
-frag.len <- which.max(x) - 1
+frag.len <- maximizeCcf(x)
 frag.len
 ```
 
@@ -1508,6 +1508,7 @@ This workflow depends on various packages from version 3.2 of the Bioconductor p
 It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/csaw)*, *[edgeR](http://bioconductor.org/packages/edgeR)*, *[Rsubread](http://bioconductor.org/packages/Rsubread)*, *[Rsamtools](http://bioconductor.org/packages/Rsamtools)*, *[Gviz](http://bioconductor.org/packages/Gviz)*, *[rtracklayer](http://bioconductor.org/packages/rtracklayer)* and *[ChIPpeakAnno](http://bioconductor.org/packages/ChIPpeakAnno)*.
 It also depends on the annotation packages *[org.Mm.eg.db](http://bioconductor.org/packages/org.Mm.eg.db)* and *[TxDb.Mmusculus.UCSC.mm10.knownGene](http://bioconductor.org/packages/TxDb.Mmusculus.UCSC.mm10.knownGene)*.
 Version numbers for all packages used are shown below.
+Installation of required packages and execution of the workflow can be performed by following the instructions at https://www.bioconductor.org/help/workflows/chipseqDB.
 
 
 ```r
