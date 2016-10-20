@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 5 May 2016
+date: 18 October 2016
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -1516,7 +1516,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.3.1 Patched (2016-08-08 r71066)
+## R version 3.3.1 Patched (2016-10-18 r71535)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: CentOS release 6.4 (Final)
 ## 
@@ -1529,38 +1529,38 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
-##  [8] datasets  methods   base     
+##  [1] grid      stats4    parallel  methods   stats     graphics  grDevices
+##  [8] utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.17.7                             
-##  [2] ChIPpeakAnno_3.7.9                      
+##  [1] Gviz_1.18.0                             
+##  [2] ChIPpeakAnno_3.8.0                      
 ##  [3] VennDiagram_1.6.17                      
 ##  [4] futile.logger_1.4.3                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.4.0
-##  [6] GenomicFeatures_1.25.20                 
+##  [6] GenomicFeatures_1.26.0                  
 ##  [7] org.Mm.eg.db_3.4.0                      
-##  [8] AnnotationDbi_1.35.5                    
-##  [9] edgeR_3.15.6                            
-## [10] limma_3.29.22                           
+##  [8] AnnotationDbi_1.36.0                    
+##  [9] edgeR_3.16.0                            
+## [10] limma_3.30.0                            
 ## [11] locfit_1.5-9.1                          
 ## [12] statmod_1.4.26                          
-## [13] csaw_1.7.4                              
-## [14] BiocParallel_1.7.9                      
-## [15] SummarizedExperiment_1.3.82             
-## [16] Biobase_2.33.4                          
-## [17] rtracklayer_1.33.12                     
-## [18] Rsamtools_1.25.2                        
-## [19] Biostrings_2.41.4                       
-## [20] XVector_0.13.7                          
-## [21] GenomicRanges_1.25.94                   
-## [22] GenomeInfoDb_1.9.15                     
-## [23] IRanges_2.7.17                          
-## [24] S4Vectors_0.11.19                       
-## [25] BiocGenerics_0.19.2                     
-## [26] Rsubread_1.23.8                         
+## [13] csaw_1.8.0                              
+## [14] BiocParallel_1.8.0                      
+## [15] SummarizedExperiment_1.4.0              
+## [16] Biobase_2.34.0                          
+## [17] rtracklayer_1.34.0                      
+## [18] Rsamtools_1.26.0                        
+## [19] Biostrings_2.42.0                       
+## [20] XVector_0.14.0                          
+## [21] GenomicRanges_1.26.0                    
+## [22] GenomeInfoDb_1.10.0                     
+## [23] IRanges_2.8.0                           
+## [24] S4Vectors_0.12.0                        
+## [25] BiocGenerics_0.20.0                     
+## [26] Rsubread_1.24.0                         
 ## [27] knitr_1.14                              
-## [28] BiocStyle_2.1.34                        
+## [28] BiocStyle_2.2.0                         
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] bitops_1.0-6                  matrixStats_0.51.0           
@@ -1570,33 +1570,33 @@ sessionInfo()
 ##  [9] Hmisc_3.17-4                  DBI_0.5-1                    
 ## [11] colorspace_1.2-7              ade4_1.7-4                   
 ## [13] nnet_7.3-12                   gridExtra_2.2.1              
-## [15] chron_2.3-47                  graph_1.51.0                 
+## [15] chron_2.3-47                  graph_1.52.0                 
 ## [17] formatR_1.4                   scales_0.4.0                 
-## [19] RBGL_1.49.3                   stringr_1.1.0                
+## [19] RBGL_1.50.0                   stringr_1.1.0                
 ## [21] digest_0.6.10                 foreign_0.8-67               
 ## [23] dichromat_2.0-0               htmltools_0.3.5              
-## [25] ensembldb_1.5.14              BSgenome_1.41.2              
-## [27] regioneR_1.5.2                RSQLite_1.0.0                
-## [29] BiocInstaller_1.23.9          shiny_0.14.1                 
-## [31] acepack_1.3-3.3               VariantAnnotation_1.19.12    
+## [25] ensembldb_1.6.0               BSgenome_1.42.0              
+## [27] regioneR_1.6.0                RSQLite_1.0.0                
+## [29] BiocInstaller_1.24.0          shiny_0.14.1                 
+## [31] acepack_1.3-3.3               VariantAnnotation_1.20.0     
 ## [33] RCurl_1.95-4.8                magrittr_1.5                 
 ## [35] GO.db_3.4.0                   Formula_1.2-1                
 ## [37] Matrix_1.2-7.1                Rcpp_0.12.7                  
 ## [39] munsell_0.4.3                 stringi_1.1.2                
-## [41] MASS_7.3-45                   zlibbioc_1.19.0              
-## [43] plyr_1.8.4                    AnnotationHub_2.5.14         
+## [41] MASS_7.3-45                   zlibbioc_1.20.0              
+## [43] plyr_1.8.4                    AnnotationHub_2.6.0          
 ## [45] lattice_0.20-34               splines_3.3.1                
-## [47] multtest_2.29.0               seqinr_3.3-3                 
-## [49] biomaRt_2.29.2                futile.options_1.0.0         
+## [47] multtest_2.30.0               seqinr_3.3-3                 
+## [49] biomaRt_2.30.0                futile.options_1.0.0         
 ## [51] XML_3.98-1.4                  evaluate_0.10                
-## [53] biovizBase_1.21.0             latticeExtra_0.6-28          
+## [53] biovizBase_1.22.0             latticeExtra_0.6-28          
 ## [55] data.table_1.9.6              lambda.r_1.1.9               
 ## [57] idr_1.2                       httpuv_1.3.3                 
 ## [59] gtable_0.2.0                  ggplot2_2.1.0                
 ## [61] mime_0.5                      xtable_1.8-2                 
-## [63] survival_2.39-5               GenomicAlignments_1.9.6      
+## [63] survival_2.39-5               GenomicAlignments_1.10.0     
 ## [65] memoise_1.0.0                 cluster_2.0.5                
-## [67] Rhtslib_1.5.4                 interactiveDisplayBase_1.11.3
+## [67] Rhtslib_1.6.0                 interactiveDisplayBase_1.12.0
 ```
 
 For the command-line tools, the `fastq-dump` utility (version 2.4.2) from the SRA Toolkit must be installed on the system, along with the `MarkDuplicates` command from the Picard software suite (version 1.117).
