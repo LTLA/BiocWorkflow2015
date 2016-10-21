@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 18 October 2016
+date: 20 October 2016
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -65,6 +65,8 @@ These two studies were chosen to represent common situations where a DB analysis
     one involving sharp binding with CBP, and the other involving broader marking with H3K9ac.
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
 The intention is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
+
+
 
 # Aligning reads in the H3K9ac libraries
 
@@ -1504,7 +1506,7 @@ Readers are encouraged to apply the concepts and code presented in this article 
 
 # Software availability
 
-This workflow depends on various packages from version 3.2 of the Bioconductor project, running on *R* version 3.2.2 or higher.
+This workflow depends on various packages from version 3.4 of the Bioconductor project, running on *R* version 3.3.1 or higher.
 It requires a number of software packages, including *[csaw](http://bioconductor.org/packages/csaw)*, *[edgeR](http://bioconductor.org/packages/edgeR)*, *[Rsubread](http://bioconductor.org/packages/Rsubread)*, *[Rsamtools](http://bioconductor.org/packages/Rsamtools)*, *[Gviz](http://bioconductor.org/packages/Gviz)*, *[rtracklayer](http://bioconductor.org/packages/rtracklayer)* and *[ChIPpeakAnno](http://bioconductor.org/packages/ChIPpeakAnno)*.
 It also depends on the annotation packages *[org.Mm.eg.db](http://bioconductor.org/packages/org.Mm.eg.db)* and *[TxDb.Mmusculus.UCSC.mm10.knownGene](http://bioconductor.org/packages/TxDb.Mmusculus.UCSC.mm10.knownGene)*.
 Version numbers for all packages used are shown below.

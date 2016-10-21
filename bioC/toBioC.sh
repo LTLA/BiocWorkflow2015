@@ -15,7 +15,7 @@ cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- T
 allauthors=`cat temp.Rmd | grep "^  \- name:" | sed "s/.*: //g" | awk -vORS=", " '{ print $0 }' | sed 's/, $/\n/'`
 allaffiliations=`cat temp.Rmd | grep "^    affiliation:" | sed "s/.*: //g" | sed "s/; /\n/g"  | awk '!a[$0]++' | awk -vORS="; " '{ print $0 }' | sed 's/; $/\n/'`
 
-cat temp.Rmd | sed "s/^author:/author: $allauthors\nauthor_affiliation: $allaffiliations/" | grep -v "^  \- name:" | grep -v "^    affiliation" > temp2.Rmd
+cat temp.Rmd | sed "s/^author:/author:\n  name: $allauthors\n  affiliation: $allaffiliations/" | grep -v "^  \- name:" | grep -v "^    affiliation" > temp2.Rmd
 
 mv temp2.Rmd temp.Rmd
 

@@ -81,6 +81,10 @@ These two studies were chosen to represent common situations where a DB analysis
 A separate workflow is described for the analysis of each data set, using the sliding window approach in both cases but with different parameter settings.
 The intention is to provide readers with a variety of usage examples from which they can construct DB analyses of their own data.
 
+```{r, eval=redownload, results='asis', echo=FALSE}
+cat('***Note:*** *to cite this article, please refer to https://f1000research.com/articles/4-1080/v2 for instructions.*')
+```
+
 # Aligning reads in the H3K9ac libraries
 
 The first task is to download the relevant ChIP-seq libraries from the NCBI Gene Expression Omnibus (GEO) [@edgar2002geo].
@@ -1202,7 +1206,9 @@ This workflow depends on various packages from version 3.4 of the Bioconductor p
 It requires a number of software packages, including `r Biocpkg("csaw")`, `r Biocpkg("edgeR")`, `r Biocpkg("Rsubread")`, `r Biocpkg("Rsamtools")`, `r Biocpkg("Gviz")`, `r Biocpkg("rtracklayer")` and `r Biocpkg("ChIPpeakAnno")`.
 It also depends on the annotation packages `r Biocannopkg("org.Mm.eg.db")` and `r Biocannopkg("TxDb.Mmusculus.UCSC.mm10.knownGene")`.
 Version numbers for all packages used are shown below.
-Installation of required packages and execution of the workflow can be performed by following the instructions at https://www.bioconductor.org/help/workflows/chipseqDB.
+```{r, eval=!redownload, results='asis', echo=FALSE}
+cat('Installation of required packages and execution of the workflow can be performed by following the instructions at https://www.bioconductor.org/help/workflows/chipseqDB.')
+```
 
 ```{r}
 sessionInfo()
