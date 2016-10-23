@@ -9,16 +9,6 @@ refdir='..'
 cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | \
     sed "s/keep.files <- TRUE/keep.files <- FALSE/" | sed "s/clear.memory <- FALSE/clear.memory <- TRUE/" > temp.Rmd
 
-# We also need to reformat the author listing and affiliations, because BioC's
-# rendering system assumes that the author YAML field is a simple string.
-
-allauthors=`cat temp.Rmd | grep "^  \- name:" | sed "s/.*: //g" | awk -vORS=", " '{ print $0 }' | sed 's/, $/\n/'`
-allaffiliations=`cat temp.Rmd | grep "^    affiliation:" | sed "s/.*: //g" | sed "s/; /\n/g"  | awk '!a[$0]++' | awk -vORS="; " '{ print $0 }' | sed 's/; $/\n/'`
-
-cat temp.Rmd | sed "s/^author:/author:\n  name: $allauthors\n  affiliation: $allaffiliations/" | grep -v "^  \- name:" | grep -v "^    affiliation" > temp2.Rmd
-
-mv temp2.Rmd temp.Rmd
-
 # We need to add a image size limiter to the HTML right after the YAML
 # block, otherwise the image size on the page depends on its actual size.
 
