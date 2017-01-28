@@ -469,7 +469,7 @@ library(locfit)
 ```{r, message=FALSE}
 library(edgeR)
 y <- asDGEList(filtered.data)
-y$offset <- offsets
+y <- scaleOffset(y, offsets)
 y <- estimateDisp(y, design)
 summary(y$trended.dispersion)
 ```
