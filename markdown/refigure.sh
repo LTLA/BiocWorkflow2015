@@ -1,4 +1,4 @@
-curfile="workflow.Rmd.pseudo"
+curfile="raw_workflow.Rmd"
 newfile="workflow.Rmd"
 cp $curfile $newfile
 
