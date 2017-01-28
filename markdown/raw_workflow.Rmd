@@ -701,17 +701,25 @@ Which is preferable depends on the purpose of the annotation -- the `detailRange
 
 Another approach to annotation is to flip the problem around, such that DB statistics are reported directly for features of interest like genes.
 This is more convenient when the DB analysis needs to be integrated with, e.g., DE analyses of matching RNA-seq data.
-In the code below, promoter coordinates are obtained by running `detailRanges` without specifying any regions.
-All windows overlapping each promoter are defined as a cluster, and DB statistics are computed as previously described for each cluster/promoter.
-This directly yields DB results for annotated features, along with some `NA` values representing promoters that have no overlapping windows (these are filtered out in the code below for demonstration purposes).
+In the code below, promoter coordinates and gene symbols are obtained from various annotation objects.
 
 ```{r}
-anno.ranges <- detailRanges(orgdb=org.Mm.eg.db, 
-   txdb=TxDb.Mmusculus.UCSC.mm10.knownGene)
-promoters <- anno.ranges[anno.ranges$exon==0L]
-olap <- findOverlaps(promoters, rowRanges(filtered.data))
+prom <- suppressWarnings(promoters(TxDb.Mmusculus.UCSC.mm10.knownGene, 
+    upstream=3000, downstream=1000, columns=c("tx_name", "gene_id")))
+entrez.ids <- sapply(prom$gene_id, FUN=function(x) x[1]) # Using the first Entrez ID.
+gene.name <- select(org.Mm.eg.db, keys=entrez.ids, keytype="ENTREZID", column="SYMBOL")
+prom$gene_name <- gene.name$SYMBOL[match(entrez.ids, gene.name$ENTREZID)]
+head(prom)
+```
+
+All windows overlapping each promoter are defined as a cluster, and DB statistics are computed as previously described for each cluster/promoter.
+This directly yields DB results for the annotated features.
+Promoters with no overlapping windows are assigned `NA` values for the various fields, and are filtered out below for demonstration purposes.
+
+```{r}
+olap <- findOverlaps(prom, rowRanges(filtered.data))
 tabprom <- combineOverlaps(olap, res$table)
-head(data.frame(Gene=promoters$symbol, tabprom)[!is.na(tabprom$PValue),])
+head(data.frame(ID=prom$tx_name, Gene=prom$gene_name, tabprom)[!is.na(tabprom$PValue),])
 ```
 
 Note that this strategy is distinct from counting reads across promoters.
