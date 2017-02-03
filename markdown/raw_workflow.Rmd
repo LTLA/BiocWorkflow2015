@@ -21,7 +21,7 @@ library(knitr)
 opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 opts_chunk$set(fig.width=7, fig.height=7)
 opts_chunk$set(dpi=300, dev="png", dev.args=list(pointsize=15))
-options(width=100)
+
 remap <- FALSE # should we remap everything?
 redownload <- FALSE # should we re-download from BioC's AWS servers?
 keep.files <- TRUE # should we keep BAM files afterwards?
