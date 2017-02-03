@@ -393,6 +393,7 @@ Here, a trended bias is present between libraries in Figure ((trendplot)).
 This refers to a systematic fold-difference in window coverage between libraries that changes according to the average abundance of the window.
 
 ```{r trendplot, fig.cap="Abundance-dependent trend in the log-fold change between two H3K9ac libraries (mature B over pro-B), across all windows retained after filtering."}
+library(edgeR)
 win.ab <- aveLogCPM(asDGEList(filtered.data))
 adjc <- log2(assay(filtered.data)+0.5)
 logfc <- adjc[,1] - adjc[,4]
