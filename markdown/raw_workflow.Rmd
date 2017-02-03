@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 28 January 2017
+date: 3 February 2017
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,9 +18,10 @@ bibliography: ref.bib
 ```{r style, echo=FALSE, results='hide', message=FALSE}
 library(BiocStyle)
 library(knitr)
-opts_chunk$set(error=FALSE)
+opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE)
 opts_chunk$set(fig.width=7, fig.height=7)
 opts_chunk$set(dpi=300, dev="png", dev.args=list(pointsize=15))
+options(width=100)
 remap <- FALSE # should we remap everything?
 redownload <- FALSE # should we re-download from BioC's AWS servers?
 keep.files <- TRUE # should we keep BAM files afterwards?
@@ -573,7 +574,6 @@ head(tabcom)
 Each row of the output table contains the statistics for a single cluster, including the combined *p*-value before and after the BH correction.
 The `nWindows` field describes the total number of windows in the cluster.
 The `logFC.up` and `logFC.down` fields describe the number of windows with a log-fold change above 0.5 or below -0.5 in each cluster, respectively.
-This can be used to determine the direction of DB in each cluster.
 
 ### Examining the scope and direction of DB
 
@@ -585,7 +585,13 @@ summary(is.sig)
 ```
 
 Determining the direction of DB is more complicated, as clusters could potentially contain windows that are changing in opposite directions.
-One approach is to define the direction based on the number of windows changing in each direction, as described above.
+One approach is to use the direction of DB from the windows that contribute most to the combined $p$-value, as reported in the `direction` field for each cluster.
+
+```{r}
+table(tabcom$direction[is.sig])
+```
+
+
 Another approach is to use the log-fold change of the most significant window (identified with the `getBestTest` function) as a proxy for the log-fold change of the cluster.
 
 ```{r}
@@ -1123,6 +1129,7 @@ tabcom <- combineTests(merged$id, res$table)
 tabbest <- getBestTest(merged$id, res$table)
 is.sig <- tabcom$FDR <= 0.05
 summary(is.sig)
+table(tabcom$direction[is.sig])
 is.sig.pos <- (tabbest$logFC > 0)[is.sig]
 summary(is.sig.pos)
 ```
