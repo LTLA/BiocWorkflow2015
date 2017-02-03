@@ -572,8 +572,7 @@ head(tabcom)
 ```
 
 Each row of the output table contains the statistics for a single cluster, including the combined *p*-value before and after the BH correction.
-The `nWindows` field describes the total number of windows in the cluster.
-The `logFC.up` and `logFC.down` fields describe the number of windows with a log-fold change above 0.5 or below -0.5 in each cluster, respectively.
+Additional fields include `nWindows`, the total number of windows in the cluster; `logFC.up`, the number of windows with a DB log-fold change above 0.5; and `log.FC.down`, the number fof windows with a log-fold change below -0.5.
 
 ### Examining the scope and direction of DB
 
@@ -584,8 +583,10 @@ is.sig <- tabcom$FDR <= 0.05
 summary(is.sig)
 ```
 
-Determining the direction of DB is more complicated, as clusters could potentially contain windows that are changing in opposite directions.
+Determining the direction of DB is more complicated, as clusters may contain windows that are changing in opposite directions.
 One approach is to use the direction of DB from the windows that contribute most to the combined $p$-value, as reported in the `direction` field for each cluster.
+If significance is driven by windows changing in both directions, the direction for the cluster is defined as `"mixed"`.
+Otherwise, the reported direction is the same as that of the windows, i.e., `"up"` or `"down"`.
 
 ```{r}
 table(tabcom$direction[is.sig])
