@@ -1,0 +1,12 @@
+*.bam
+*.bam.bai
+*.sra
+*.bed
+*.Rda
+*.rds
+
+workflow.Rmd
+aligntest/
+bioC/markdown/
+index
+mm9ToMm10.over.chain
