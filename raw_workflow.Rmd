@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 3 February 2017
+date: 23 February 2017
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -236,29 +236,20 @@ Alignment of all (non-specifically immunoprecipitated) reads from the former wil
 Moreover, differences in repeat copy numbers between conditions can lead to detection of spurious DB.
 
 As such, these problematic regions must be removed prior to further analysis.
-This is done with an annotated blacklist for the [mm9 build of the mouse genome](http://www.broadinstitute.org/~anshul/projects/mouse/blacklist/mm9-blacklist.bed.gz).
-All reads mapped to intervals in the blacklist will be ignored during processing in `r Biocpkg("csaw")`.
+This is done with an annotated blacklist for the [mm10 build of the mouse genome](http://www.broadinstitute.org/~anshul/projects/mouse/blacklist/mm10-blacklist.bed.gz).
+Genomic intervals in the blacklist are loaded to memory using the `import` method from the `r Biocpkg("rtracklayer")` package.
+All reads mapped to those intervals will be ignored during processing in `r Biocpkg("csaw")`.
 The blacklist itself was constructed by identifying consistently problematic regions in the ENCODE and modENCODE data sets [@encode2012encode].
 
-Recall that the reads were aligned to the mm10 genome build, so the mm9 blacklist coordinates must be transferred to their mm10 equivalents.
-This is done using the `liftOver` function in the `r Biocpkg("rtracklayer")` package [@lawrence2009rtracklayer].
-The chain file specifies the corresponding coordinates between the two builds and is obtained [here](http://hgdownload-test.cse.ucsc.edu/goldenPath/mm9/liftOver/mm9ToMm10.over.chain.gz).
-The new blacklist coordinates are saved to file for future use.
-
 ```{r, eval=redownload, message=FALSE, echo=FALSE, results="hide"}
-chain.file <- "mm9ToMm10.over.chain"
-download.file(paste0(core.loc, chain.file), chain.file)
-bed.file <- "mm9-blacklist.bed"
+bed.file <- "mm10-blacklist.bed"
 download.file(paste0(core.loc, bed.file), bed.file)
 ```
 
 ```{r, message=FALSE}
 library(rtracklayer)
-ch <- import.chain("mm9ToMm10.over.chain")
-original <- import("mm9-blacklist.bed")
-blacklist <- liftOver(x=original, chain=ch)
-blacklist <- unlist(blacklist)
-saveRDS(file="mm10-blacklist.rds", blacklist)
+blacklist <- import("mm9-blacklist.bed")
+blaclist
 ```
 
 Any user-defined set of regions can be used as a blacklist in this analysis.
