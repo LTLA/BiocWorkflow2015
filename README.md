@@ -7,17 +7,13 @@ Instead, we hard-code the figure numbers into the markdown text, so that it make
 Figure numbers are also hardcoded into the captions, which means that you need to specify empty captions within LaTeX.
 
 ```
-cd markdown
 ./refigure.sh
-cd -
 ```
 
 The second step is to compile the R markdown file. 
 
 ```
-cd markdown
 echo "knitr::knit('workflow.Rmd')" | R --no-save --vanilla
-cd -
 ```
 
 Currently, alignment is turned off to ensure we get the same results upon re-analysis (as Rsubread changes quite regularly, and I don't won't to have to keep on checking it). 
@@ -36,11 +32,7 @@ Here, we convert it to HTML using render(), but it's also possible to convert to
 The equivalent F1000 article was generated using the latter approach.
 
 ```
-cd converted
-cp ../markdown/workflow.md .
-rsync -azv --delete ../markdown/figure . --exclude=".svn"
 R -e "rmarkdown::render('workflow.md')"
-cd -
 ```
 
 We also need to convert the R markdown into something that BioC can compile.

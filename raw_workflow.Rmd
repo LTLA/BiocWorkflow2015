@@ -242,14 +242,14 @@ All reads mapped to those intervals will be ignored during processing in `r Bioc
 The blacklist itself was constructed by identifying consistently problematic regions in the ENCODE and modENCODE data sets [@encode2012encode].
 
 ```{r, eval=redownload, message=FALSE, echo=FALSE, results="hide"}
-bed.file <- "mm10-blacklist.bed"
+bed.file <- "mm10.blacklist.bed.gz"
 download.file(paste0(core.loc, bed.file), bed.file)
 ```
 
 ```{r, message=FALSE}
 library(rtracklayer)
-blacklist <- import("mm9-blacklist.bed")
-blaclist
+blacklist <- import("mm10.blacklist.bed.gz")
+blacklist
 ```
 
 Any user-defined set of regions can be used as a blacklist in this analysis.
