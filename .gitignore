@@ -2,6 +2,7 @@
 *.bam.bai
 *.sra
 *.bed
+*.bed.gz
 *.Rda
 *.rds
 
@@ -10,3 +11,4 @@ aligntest/
 bioC/markdown/
 index
 mm9ToMm10.over.chain
+
