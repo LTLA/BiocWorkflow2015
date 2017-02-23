@@ -5,7 +5,7 @@ author:
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
   - name: Gordon K. Smyth
     affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 3 February 2017
+date: 23 February 2017
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -224,25 +224,37 @@ Alignment of all (non-specifically immunoprecipitated) reads from the former wil
 Moreover, differences in repeat copy numbers between conditions can lead to detection of spurious DB.
 
 As such, these problematic regions must be removed prior to further analysis.
-This is done with an annotated blacklist for the [mm9 build of the mouse genome](http://www.broadinstitute.org/~anshul/projects/mouse/blacklist/mm9-blacklist.bed.gz).
-All reads mapped to intervals in the blacklist will be ignored during processing in *[csaw](http://bioconductor.org/packages/csaw)*.
+This is done with an annotated blacklist for the [mm10 build of the mouse genome](http://www.broadinstitute.org/~anshul/projects/mouse/blacklist/mm10-blacklist.bed.gz).
+Genomic intervals in the blacklist are loaded to memory using the `import` method from the *[rtracklayer](http://bioconductor.org/packages/rtracklayer)* package.
+All reads mapped to those intervals will be ignored during processing in *[csaw](http://bioconductor.org/packages/csaw)*.
 The blacklist itself was constructed by identifying consistently problematic regions in the ENCODE and modENCODE data sets [@encode2012encode].
-
-Recall that the reads were aligned to the mm10 genome build, so the mm9 blacklist coordinates must be transferred to their mm10 equivalents.
-This is done using the `liftOver` function in the *[rtracklayer](http://bioconductor.org/packages/rtracklayer)* package [@lawrence2009rtracklayer].
-The chain file specifies the corresponding coordinates between the two builds and is obtained [here](http://hgdownload-test.cse.ucsc.edu/goldenPath/mm9/liftOver/mm9ToMm10.over.chain.gz).
-The new blacklist coordinates are saved to file for future use.
 
 
 
 
 ```r
 library(rtracklayer)
-ch <- import.chain("mm9ToMm10.over.chain")
-original <- import("mm9-blacklist.bed")
-blacklist <- liftOver(x=original, chain=ch)
-blacklist <- unlist(blacklist)
-saveRDS(file="mm10-blacklist.rds", blacklist)
+blacklist <- import("mm10.blacklist.bed.gz")
+blacklist
+```
+
+```
+## GRanges object with 164 ranges and 0 metadata columns:
+##         seqnames                 ranges strand
+##            <Rle>              <IRanges>  <Rle>
+##     [1]    chr10   [ 3110061,  3110270]      *
+##     [2]    chr10   [22142531, 22142880]      *
+##     [3]    chr10   [22142831, 22143070]      *
+##     [4]    chr10   [58223871, 58224100]      *
+##     [5]    chr10   [58225261, 58225500]      *
+##     ...      ...                    ...    ...
+##   [160]     chr9 [  3038051,   3038300]      *
+##   [161]     chr9 [ 24541941,  24542200]      *
+##   [162]     chr9 [ 35305121,  35305620]      *
+##   [163]     chr9 [110281191, 110281400]      *
+##   [164]     chr9 [123872951, 123873160]      *
+##   -------
+##   seqinfo: 19 sequences from an unspecified genome; no seqlengths
 ```
 
 Any user-defined set of regions can be used as a blacklist in this analysis.
@@ -307,7 +319,7 @@ frag.len
 ```
 
 ```
-## [1] 149
+## [1] 148
 ```
 
 
@@ -343,7 +355,7 @@ win.data
 
 ```
 ## class: RangedSummarizedExperiment 
-## dim: 1576775 4 
+## dim: 1578941 4 
 ## metadata(6): spacing width ... param final.ext
 ## assays(1): counts
 ## rownames: NULL
@@ -387,7 +399,7 @@ summary(keep)
 
 ```
 ##    Mode   FALSE    TRUE 
-## logical  911815  664960
+## logical  907923  671018
 ```
 
 The effect of the fold-change threshold is examined visually in Figure 2.
@@ -442,12 +454,12 @@ head(offsets)
 
 ```
 ##            [,1]       [,2]      [,3]      [,4]
-## [1,] -0.5879830 -0.4004862 0.3940427 0.5944264
-## [2,] -0.5679289 -0.3775068 0.3751611 0.5702746
-## [3,] -0.6255103 -0.4707667 0.4390110 0.6572660
-## [4,] -0.6524207 -0.5441667 0.4782769 0.7183104
-## [5,] -0.6709441 -0.5830790 0.5011725 0.7528507
-## [6,] -0.7054977 -0.6520510 0.5423334 0.8152153
+## [1,] -0.5877976 -0.4025337 0.3956788 0.5946524
+## [2,] -0.5666204 -0.3795870 0.3771290 0.5690783
+## [3,] -0.6261282 -0.4722153 0.4397219 0.6586216
+## [4,] -0.6529113 -0.5451086 0.4786559 0.7193639
+## [5,] -0.6713865 -0.5836750 0.5012739 0.7537877
+## [6,] -0.7027471 -0.6462644 0.5385283 0.8104832
 ```
 
 The effect of non-linear normalization is visualized with another mean-difference plot.
@@ -531,7 +543,7 @@ summary(y$trended.dispersion)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.03156 0.04183 0.04263 0.04161 0.04292 0.04349
+## 0.03156 0.04223 0.04303 0.04201 0.04339 0.04401
 ```
 
 The NB dispersion trend is visualized in Figure 5 as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
@@ -582,7 +594,7 @@ summary(fit$df.prior)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.2507 22.8709 22.8709 22.8687 22.8709 22.8709
+##  0.2489 22.5895 22.5895 22.5871 22.5895 22.5895
 ```
 
 ### Examining the data with MDS plots
@@ -619,12 +631,12 @@ head(res$table)
 
 ```
 ##       logFC    logCPM         F     PValue
-## 1 0.8090441 0.4027679 0.9428751 0.34088901
-## 2 0.7905861 0.3568925 0.9050002 0.35059870
-## 3 2.0535723 0.5870176 5.3260881 0.02961365
-## 4 1.1975733 0.8415242 2.6891379 0.11362350
-## 5 0.9766762 0.9969269 2.0632338 0.16335024
-## 6 0.4456889 1.2882787 0.5381851 0.47004534
+## 1 0.8063920 0.3912971 0.9332760 0.34341912
+## 2 0.7893982 0.3454231 0.8984019 0.35243335
+## 3 2.0507140 0.5751363 5.3156694 0.02986221
+## 4 1.1955209 0.8296550 2.6809910 0.11428820
+## 5 0.9752054 0.9850667 2.0555736 0.16424474
+## 6 0.6474772 1.2478327 1.0900209 0.30662251
 ```
 
 ### Controlling the FDR across regions
@@ -659,12 +671,12 @@ head(tabcom)
 
 ```
 ##   nWindows logFC.up logFC.down      PValue        FDR direction
-## 1        2        2          0 0.350598701 0.48160728        up
-## 2       24        9          0 0.038877851 0.09175702        up
-## 3        8        1          3 0.388098522 0.51690454     mixed
-## 4       11        1          2 0.838230140 0.91200504     mixed
-## 5       36       14          6 0.014537829 0.04481033        up
-## 6       18        7          9 0.006569436 0.02605174     mixed
+## 1        2        2          0 0.352433346 0.48263064        up
+## 2       24       10          0 0.039784142 0.09279608        up
+## 3        8        1          3 0.383142591 0.51116227     mixed
+## 4       11        1          2 0.835600108 0.91060843     mixed
+## 5       36       14          6 0.014843789 0.04531172        up
+## 6       18        7          9 0.006727217 0.02639759     mixed
 ```
 
 Each row of the output table contains the statistics for a single cluster, including the combined *p*-value before and after the BH correction.
@@ -682,7 +694,7 @@ summary(is.sig)
 
 ```
 ##    Mode   FALSE    TRUE 
-## logical   26076   13461
+## logical   26040   13561
 ```
 
 Determining the direction of DB is more complicated, as clusters may contain windows that are changing in opposite directions.
@@ -698,7 +710,7 @@ table(tabcom$direction[is.sig])
 ```
 ## 
 ##  down mixed    up 
-##  8040   182  5239
+##  8102   186  5273
 ```
 
 
@@ -711,13 +723,13 @@ head(tabbest)
 ```
 
 ```
-##   best      logFC    logCPM          F     PValue        FDR
-## 1    1  0.8090441 0.4027679  0.9428751 0.68177803 0.89053017
-## 2   14  6.4901458 0.7986739 12.3990147 0.04219805 0.10752670
-## 3   29 -0.8933906 1.4187666  3.1557522 0.70316772 0.91147742
-## 4   42 -0.9084265 0.9703643  2.4473565 1.00000000 1.00000000
-## 5   64  6.5020708 0.8032600 14.3334992 0.03275071 0.08985252
-## 6   88  6.5140534 0.8078495 15.7058419 0.01049564 0.04083846
+##   best      logFC    logCPM         F     PValue        FDR
+## 1    1  0.8063920 0.3912971  0.933276 0.68683824 0.89525561
+## 2   14  6.4893918 0.7860691 12.370207 0.04317511 0.10886143
+## 3   29 -0.8950763 1.4077073  3.164336 0.70104033 0.90858671
+## 4   42 -0.9102218 0.9593517  2.452752 1.00000000 1.00000000
+## 5   64  6.5014382 0.7907657 14.316155 0.03345783 0.09103628
+## 6   88  6.5135369 0.7954657 15.698385 0.01070837 0.04135579
 ```
 
 In the above table, each row contains the statistics for each cluster.
@@ -733,7 +745,7 @@ summary(is.sig.pos)
 
 ```
 ##    Mode   FALSE    TRUE 
-## logical    8146    5315
+## logical    8209    5352
 ```
 
 This approach is generally satisfactory, though it will not capture multiple changes in opposite directions.
@@ -915,12 +927,12 @@ head(data.frame(ID=prom$tx_name, Gene=prom$gene_name, tabprom)[!is.na(tabprom$PV
 
 ```
 ##           ID    Gene nWindows logFC.up logFC.down      PValue        FDR
-## 1 uc007afg.1  Lypla1       19        2          5 0.675900982 0.71352409
-## 2 uc007afh.1  Lypla1       19        2          5 0.675900982 0.71352409
-## 3 uc007afi.2   Tcea1       33       14          3 0.013326343 0.02829060
-## 4 uc011wht.1   Tcea1       33       14          3 0.013326343 0.02829060
-## 5 uc011whu.1   Tcea1       36       14          6 0.014537829 0.03016165
-## 7 uc007afm.2 Atp6v1h       18        7          9 0.006569436 0.01772967
+## 1 uc007afg.1  Lypla1       19        2          5 0.606642435 0.64726866
+## 2 uc007afh.1  Lypla1       19        2          5 0.606642435 0.64726866
+## 3 uc007afi.2   Tcea1       33       14          3 0.013606806 0.02829006
+## 4 uc011wht.1   Tcea1       33       14          3 0.013606806 0.02829006
+## 5 uc011whu.1   Tcea1       36       14          6 0.014843789 0.03022505
+## 7 uc007afm.2 Atp6v1h       18        7          9 0.006727217 0.01762778
 ##   direction
 ## 1     mixed
 ## 2     mixed
@@ -977,12 +989,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr17 [34285101, 34289950]      * |        94         0
-##       logFC.down                 PValue               FDR   direction
-##        <integer>              <numeric>         <numeric> <character>
-##   [1]         94 0.00000000000003979446 0.000000001072967        down
+##       logFC.down                PValue               FDR   direction
+##        <integer>             <numeric>         <numeric> <character>
+##   [1]         94 0.0000000000000533098 0.000000001406327        down
 ##        best.pos best.logFC                           overlap
 ##       <integer>  <numeric>                          <factor>
-##   [1]  34287575  -7.181048 H2-Aa|0-1|-,H2-Eb1|I|+,Notch4|I|+
+##   [1]  34287575  -7.156526 H2-Aa|0-1|-,H2-Eb1|I|+,Notch4|I|+
 ##                   left    right
 ##               <factor> <factor>
 ##   [1] H2-Aa|2-6|-[278]         
@@ -1034,10 +1046,10 @@ cur.region
 ##   [1]     chr5 [122987201, 122991450]      * |        83        17
 ##       logFC.down             PValue             FDR   direction  best.pos
 ##        <integer>          <numeric>       <numeric> <character> <integer>
-##   [1]         43 0.0000000002183505 0.0000001918427        down 122990925
+##   [1]         43 0.0000000002645352 0.0000002327969        down 122990925
 ##       best.logFC                         overlap              left
 ##        <numeric>                        <factor>          <factor>
-##   [1]   -5.46589 A930024E05Rik|0-1|+,Kdm2b|0-3|- Kdm2b|4-5|-[2661]
+##   [1]  -5.468269 A930024E05Rik|0-1|+,Kdm2b|0-3|- Kdm2b|4-5|-[2661]
 ##                         right
 ##                      <factor>
 ##   [1] A930024E05Rik|2|+[2913]
@@ -1087,12 +1099,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr16 [36665551, 36666200]      * |        11         0
-##       logFC.down             PValue             FDR   direction  best.pos
-##        <integer>          <numeric>       <numeric> <character> <integer>
-##   [1]         11 0.0000000003411619 0.0000002579118        down  36665925
+##       logFC.down            PValue             FDR   direction  best.pos
+##        <integer>         <numeric>       <numeric> <character> <integer>
+##   [1]         11 0.000000000398225 0.0000003006085        down  36665925
 ##       best.logFC    overlap     left    right
 ##        <numeric>   <factor> <factor> <factor>
-##   [1]  -4.886498 Cd86|0-1|-                  
+##   [1]  -4.888892 Cd86|0-1|-                  
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome
 ```
@@ -1267,7 +1279,7 @@ win.data
 
 ```
 ## class: RangedSummarizedExperiment 
-## dim: 9127697 4 
+## dim: 9144853 4 
 ## metadata(6): spacing width ... param final.ext
 ## assays(1): counts
 ## rownames: NULL
@@ -1301,7 +1313,7 @@ normfacs
 ```
 
 ```
-## [1] 1.0118470 0.9081406 1.0448053 1.0415897
+## [1] 1.0119932 0.9068229 1.0453833 1.0423759
 ```
 
 The effect of normalization is visualized with some mean-difference plots between pairs of libraries (Figure 11).
@@ -1351,7 +1363,7 @@ summary(keep)
 
 ```
 ##    Mode   FALSE    TRUE 
-## logical 8862431  265266
+## logical 8873591  271262
 ```
 
 ```r
@@ -1402,7 +1414,7 @@ summary(y$trended.dispersion)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.1041  0.1673  0.1868  0.1892  0.2163  0.2602
+##  0.1051  0.1666  0.1859  0.1883  0.2148  0.2572
 ```
 
 ```r
@@ -1451,7 +1463,7 @@ summary(is.sig)
 
 ```
 ##    Mode   FALSE    TRUE 
-## logical   55928    1480
+## logical   56538    1522
 ```
 
 ```r
@@ -1461,7 +1473,7 @@ table(tabcom$direction[is.sig])
 ```
 ## 
 ##   up 
-## 1480
+## 1522
 ```
 
 ```r
@@ -1471,7 +1483,7 @@ summary(is.sig.pos)
 
 ```
 ##    Mode    TRUE 
-## logical    1480
+## logical    1522
 ```
 
 These results are saved to file, as previously described.
@@ -1515,12 +1527,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr16 [70313851, 70314860]      * |        21        21
-##       logFC.down            PValue         FDR   direction  best.pos
-##        <integer>         <numeric>   <numeric> <character> <integer>
-##   [1]          0 0.000000006193145 0.000177768          up  70314555
+##       logFC.down           PValue         FDR   direction  best.pos
+##        <integer>        <numeric>   <numeric> <character> <integer>
+##   [1]          0 0.00000003949847 0.001146641          up  70314555
 ##       best.logFC    overlap     left    right
 ##        <numeric>   <factor> <factor> <factor>
-##   [1]   4.546375 Gbe1|0-1|+                  
+##   [1]    4.54601 Gbe1|0-1|+                  
 ##   -------
 ##   seqinfo: 66 sequences from an unspecified genome
 ```
@@ -1603,58 +1615,60 @@ sessionInfo()
 ##  [3] VennDiagram_1.6.17                      
 ##  [4] futile.logger_1.4.3                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.4.0
-##  [6] GenomicFeatures_1.27.6                  
+##  [6] GenomicFeatures_1.27.8                  
 ##  [7] org.Mm.eg.db_3.4.0                      
-##  [8] AnnotationDbi_1.37.2                    
+##  [8] AnnotationDbi_1.37.3                    
 ##  [9] locfit_1.5-9.1                          
 ## [10] statmod_1.4.27                          
 ## [11] edgeR_3.17.5                            
-## [12] limma_3.31.10                           
+## [12] limma_3.31.14                           
 ## [13] csaw_1.9.6                              
 ## [14] BiocParallel_1.9.5                      
-## [15] SummarizedExperiment_1.5.4              
-## [16] Biobase_2.35.0                          
-## [17] rtracklayer_1.35.5                      
-## [18] Rsamtools_1.27.12                       
-## [19] Biostrings_2.43.4                       
-## [20] XVector_0.15.2                          
-## [21] GenomicRanges_1.27.22                   
-## [22] GenomeInfoDb_1.11.6                     
-## [23] IRanges_2.9.18                          
-## [24] S4Vectors_0.13.13                       
-## [25] BiocGenerics_0.21.3                     
-## [26] Rsubread_1.25.1                         
-## [27] knitr_1.15.1                            
-## [28] BiocStyle_2.3.30                        
+## [15] SummarizedExperiment_1.5.7              
+## [16] DelayedArray_0.1.7                      
+## [17] matrixStats_0.51.0                      
+## [18] Biobase_2.35.1                          
+## [19] rtracklayer_1.35.6                      
+## [20] Rsamtools_1.27.12                       
+## [21] Biostrings_2.43.4                       
+## [22] XVector_0.15.2                          
+## [23] GenomicRanges_1.27.22                   
+## [24] GenomeInfoDb_1.11.9                     
+## [25] IRanges_2.9.18                          
+## [26] S4Vectors_0.13.15                       
+## [27] BiocGenerics_0.21.3                     
+## [28] Rsubread_1.25.1                         
+## [29] knitr_1.15.1                            
+## [30] BiocStyle_2.3.30                        
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] ProtGenerics_1.7.0            bitops_1.0-6                 
-##  [3] matrixStats_0.51.0            RColorBrewer_1.1-2           
-##  [5] httr_1.2.1                    rprojroot_1.2                
-##  [7] tools_3.4.0                   backports_1.0.5              
-##  [9] R6_2.2.0                      rpart_4.1-10                 
-## [11] KernSmooth_2.23-15            Hmisc_4.0-2                  
-## [13] DBI_0.5-1                     lazyeval_0.2.0               
-## [15] colorspace_1.3-2              nnet_7.3-12                  
-## [17] ade4_1.7-5                    gridExtra_2.2.1              
-## [19] graph_1.53.0                  htmlTable_1.9                
-## [21] checkmate_1.8.2               scales_0.4.1                 
-## [23] RBGL_1.51.0                   stringr_1.1.0                
-## [25] digest_0.6.12                 foreign_0.8-67               
-## [27] rmarkdown_1.3                 dichromat_2.0-0              
-## [29] base64enc_0.1-3               htmltools_0.3.5              
-## [31] ensembldb_1.99.12             BSgenome_1.43.5              
-## [33] highr_0.6                     regioneR_1.7.3               
-## [35] htmlwidgets_0.8               RSQLite_1.1-2                
-## [37] BiocInstaller_1.25.3          shiny_1.0.0                  
-## [39] acepack_1.4.1                 VariantAnnotation_1.21.15    
-## [41] RCurl_1.95-4.8                magrittr_1.5                 
-## [43] GO.db_3.4.0                   Formula_1.2-1                
+##  [3] RColorBrewer_1.1-2            httr_1.2.1                   
+##  [5] rprojroot_1.2                 tools_3.4.0                  
+##  [7] backports_1.0.5               R6_2.2.0                     
+##  [9] rpart_4.1-10                  KernSmooth_2.23-15           
+## [11] lazyeval_0.2.0                Hmisc_4.0-2                  
+## [13] DBI_0.5-1                     colorspace_1.3-2             
+## [15] nnet_7.3-12                   ade4_1.7-5                   
+## [17] gridExtra_2.2.1               graph_1.53.0                 
+## [19] htmlTable_1.9                 checkmate_1.8.2              
+## [21] scales_0.4.1                  RBGL_1.51.0                  
+## [23] stringr_1.2.0                 digest_0.6.12                
+## [25] foreign_0.8-67                rmarkdown_1.3                
+## [27] dichromat_2.0-0               base64enc_0.1-3              
+## [29] htmltools_0.3.5               ensembldb_1.99.12            
+## [31] BSgenome_1.43.5               highr_0.6                    
+## [33] regioneR_1.7.3                htmlwidgets_0.8              
+## [35] RSQLite_1.1-2                 BiocInstaller_1.25.3         
+## [37] shiny_1.0.0                   acepack_1.4.1                
+## [39] VariantAnnotation_1.21.15     RCurl_1.95-4.8               
+## [41] magrittr_1.5                  Formula_1.2-1                
+## [43] GO.db_3.4.0                   GenomeInfoDbData_0.99.0      
 ## [45] Matrix_1.2-8                  Rcpp_0.12.9                  
 ## [47] munsell_0.4.3                 stringi_1.1.2                
 ## [49] yaml_2.1.14                   MASS_7.3-45                  
 ## [51] zlibbioc_1.21.0               plyr_1.8.4                   
-## [53] AnnotationHub_2.7.11          lattice_0.20-34              
+## [53] AnnotationHub_2.7.13          lattice_0.20-34              
 ## [55] splines_3.4.0                 multtest_2.31.0              
 ## [57] seqinr_3.3-3                  biomaRt_2.31.4               
 ## [59] futile.options_1.0.0          XML_3.98-1.5                 
