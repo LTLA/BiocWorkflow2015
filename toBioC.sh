@@ -5,8 +5,8 @@
 # order to tell the build system to re-download the files; and clear.memory 
 # to TRUE, in order to get it to delete objects to save memory.
 
-refdir='..'
-cat ${refdir}/markdown/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | \
+refdir='.'
+cat ${refdir}/workflow.Rmd | sed "s/redownload <- FALSE/redownload <- TRUE/" | \
     sed "s/keep.files <- TRUE/keep.files <- FALSE/" | sed "s/clear.memory <- FALSE/clear.memory <- TRUE/" > temp.Rmd
 
 # We need to add a image size limiter to the HTML right after the YAML
@@ -25,8 +25,9 @@ mv temp2.Rmd temp.Rmd
 
 # Moving to the BioC folder, if it isn't there already.
 
-mv temp.Rmd ${refdir}/bioC/markdown/chipseq_db.Rmd
-cp ${refdir}/converted/ref.bib ${refdir}/bioC/markdown 
+reldir='../bioc'
+mv temp.Rmd ${reldir}/chipseq_db.Rmd
+cp ${refdir}/ref.bib ${reldir}
 
 exit 0
 
@@ -34,13 +35,11 @@ exit 0
 # This is necessary in order for BioC's build system to access the files,
 # as we can't unpack and align from the SRA files themselves.
 
-cd ${refdir}/markdown
 for x in `ls | egrep "\.(bam|bai)$"`
 do
     echo $x
     aws s3 cp $x s3://chipseqdb-bamfiles --acl public-read 
 done
 
-aws s3 cp mm9-blacklist.bed s3://chipseqdb-bamfiles --acl public-read 
-aws s3 cp mm9ToMm10.over.chain s3://chipseqdb-bamfiles --acl public-read 
+aws s3 cp mm10.blacklist.bed.gz s3://chipseqdb-bamfiles --acl public-read 
 

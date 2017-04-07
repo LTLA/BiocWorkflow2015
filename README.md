@@ -39,7 +39,5 @@ We also need to convert the R markdown into something that BioC can compile.
 This is done using the 'toBioC.sh' script, which flips some flags and modifies the YAML metadata so that it is compatible with BioC's build system.
 
 ```
-cd bioC
 ./toBioC.sh
-cd -
 ```
