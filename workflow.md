@@ -989,15 +989,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr17 [34285101, 34289950]      * |        94         0
-##       logFC.down                PValue               FDR   direction
-##        <integer>             <numeric>         <numeric> <character>
-##   [1]         94 0.0000000000000533098 0.000000001406327        down
-##        best.pos best.logFC                           overlap
-##       <integer>  <numeric>                          <factor>
-##   [1]  34287575  -7.156526 H2-Aa|0-1|-,H2-Eb1|I|+,Notch4|I|+
-##                   left    right
-##               <factor> <factor>
-##   [1] H2-Aa|2-6|-[278]         
+##       logFC.down      PValue          FDR   direction  best.pos best.logFC
+##        <integer>   <numeric>    <numeric> <character> <integer>  <numeric>
+##   [1]         94 5.33098e-14 1.406327e-09        down  34287575  -7.156526
+##                                 overlap             left    right
+##                                <factor>         <factor> <factor>
+##   [1] H2-Aa|0-1|-,H2-Eb1|I|+,Notch4|I|+ H2-Aa|2-6|-[278]         
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome
 ```
@@ -1044,9 +1041,9 @@ cur.region
 ##       seqnames                 ranges strand |  nWindows  logFC.up
 ##          <Rle>              <IRanges>  <Rle> | <integer> <integer>
 ##   [1]     chr5 [122987201, 122991450]      * |        83        17
-##       logFC.down             PValue             FDR   direction  best.pos
-##        <integer>          <numeric>       <numeric> <character> <integer>
-##   [1]         43 0.0000000002645352 0.0000002327969        down 122990925
+##       logFC.down       PValue          FDR   direction  best.pos
+##        <integer>    <numeric>    <numeric> <character> <integer>
+##   [1]         43 2.645352e-10 2.327969e-07        down 122990925
 ##       best.logFC                         overlap              left
 ##        <numeric>                        <factor>          <factor>
 ##   [1]  -5.468269 A930024E05Rik|0-1|+,Kdm2b|0-3|- Kdm2b|4-5|-[2661]
@@ -1099,12 +1096,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr16 [36665551, 36666200]      * |        11         0
-##       logFC.down            PValue             FDR   direction  best.pos
-##        <integer>         <numeric>       <numeric> <character> <integer>
-##   [1]         11 0.000000000398225 0.0000003006085        down  36665925
-##       best.logFC    overlap     left    right
-##        <numeric>   <factor> <factor> <factor>
-##   [1]  -4.888892 Cd86|0-1|-                  
+##       logFC.down      PValue          FDR   direction  best.pos best.logFC
+##        <integer>   <numeric>    <numeric> <character> <integer>  <numeric>
+##   [1]         11 3.98225e-10 3.006085e-07        down  36665925  -4.888892
+##          overlap     left    right
+##         <factor> <factor> <factor>
+##   [1] Cd86|0-1|-                  
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome
 ```
@@ -1527,12 +1524,12 @@ cur.region
 ##       seqnames               ranges strand |  nWindows  logFC.up
 ##          <Rle>            <IRanges>  <Rle> | <integer> <integer>
 ##   [1]    chr16 [70313851, 70314860]      * |        21        21
-##       logFC.down           PValue         FDR   direction  best.pos
-##        <integer>        <numeric>   <numeric> <character> <integer>
-##   [1]          0 0.00000003949847 0.001146641          up  70314555
-##       best.logFC    overlap     left    right
-##        <numeric>   <factor> <factor> <factor>
-##   [1]    4.54601 Gbe1|0-1|+                  
+##       logFC.down       PValue         FDR   direction  best.pos best.logFC
+##        <integer>    <numeric>   <numeric> <character> <integer>  <numeric>
+##   [1]          0 3.949847e-08 0.001146641          up  70314555    4.54601
+##          overlap     left    right
+##         <factor> <factor> <factor>
+##   [1] Gbe1|0-1|+                  
 ##   -------
 ##   seqinfo: 66 sequences from an unspecified genome
 ```
@@ -1610,36 +1607,36 @@ sessionInfo()
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.19.2                             
-##  [2] ChIPpeakAnno_3.9.11                     
+##  [1] Gviz_1.19.3                             
+##  [2] ChIPpeakAnno_3.9.16                     
 ##  [3] VennDiagram_1.6.17                      
 ##  [4] futile.logger_1.4.3                     
 ##  [5] TxDb.Mmusculus.UCSC.mm10.knownGene_3.4.0
-##  [6] GenomicFeatures_1.27.8                  
-##  [7] org.Mm.eg.db_3.4.0                      
-##  [8] AnnotationDbi_1.37.3                    
+##  [6] GenomicFeatures_1.27.12                 
+##  [7] org.Mm.eg.db_3.4.1                      
+##  [8] AnnotationDbi_1.37.4                    
 ##  [9] locfit_1.5-9.1                          
-## [10] statmod_1.4.27                          
+## [10] statmod_1.4.29                          
 ## [11] edgeR_3.17.5                            
-## [12] limma_3.31.14                           
-## [13] csaw_1.9.6                              
+## [12] limma_3.31.19                           
+## [13] csaw_1.9.10                             
 ## [14] BiocParallel_1.9.5                      
 ## [15] SummarizedExperiment_1.5.7              
 ## [16] DelayedArray_0.1.7                      
-## [17] matrixStats_0.51.0                      
+## [17] matrixStats_0.52.1                      
 ## [18] Biobase_2.35.1                          
-## [19] rtracklayer_1.35.6                      
-## [20] Rsamtools_1.27.12                       
-## [21] Biostrings_2.43.4                       
+## [19] rtracklayer_1.35.10                     
+## [20] Rsamtools_1.27.15                       
+## [21] Biostrings_2.43.7                       
 ## [22] XVector_0.15.2                          
-## [23] GenomicRanges_1.27.22                   
-## [24] GenomeInfoDb_1.11.9                     
-## [25] IRanges_2.9.18                          
+## [23] GenomicRanges_1.27.23                   
+## [24] GenomeInfoDb_1.11.10                    
+## [25] IRanges_2.9.19                          
 ## [26] S4Vectors_0.13.15                       
 ## [27] BiocGenerics_0.21.3                     
-## [28] Rsubread_1.25.1                         
+## [28] Rsubread_1.25.2                         
 ## [29] knitr_1.15.1                            
-## [30] BiocStyle_2.3.30                        
+## [30] BiocStyle_2.3.31                        
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] ProtGenerics_1.7.0            bitops_1.0-6                 
@@ -1647,40 +1644,40 @@ sessionInfo()
 ##  [5] rprojroot_1.2                 tools_3.4.0                  
 ##  [7] backports_1.0.5               R6_2.2.0                     
 ##  [9] rpart_4.1-10                  KernSmooth_2.23-15           
-## [11] lazyeval_0.2.0                Hmisc_4.0-2                  
-## [13] DBI_0.5-1                     colorspace_1.3-2             
-## [15] nnet_7.3-12                   ade4_1.7-5                   
+## [11] Hmisc_4.0-2                   colorspace_1.3-2             
+## [13] DBI_0.6-1                     lazyeval_0.2.0               
+## [15] nnet_7.3-12                   ade4_1.7-6                   
 ## [17] gridExtra_2.2.1               graph_1.53.0                 
 ## [19] htmlTable_1.9                 checkmate_1.8.2              
 ## [21] scales_0.4.1                  RBGL_1.51.0                  
 ## [23] stringr_1.2.0                 digest_0.6.12                
-## [25] foreign_0.8-67                rmarkdown_1.3                
+## [25] foreign_0.8-67                rmarkdown_1.4                
 ## [27] dichromat_2.0-0               base64enc_0.1-3              
-## [29] htmltools_0.3.5               ensembldb_1.99.12            
-## [31] BSgenome_1.43.5               highr_0.6                    
+## [29] htmltools_0.3.5               ensembldb_1.99.13            
+## [31] BSgenome_1.43.7               highr_0.6                    
 ## [33] regioneR_1.7.3                htmlwidgets_0.8              
 ## [35] RSQLite_1.1-2                 BiocInstaller_1.25.3         
-## [37] shiny_1.0.0                   acepack_1.4.1                
-## [39] VariantAnnotation_1.21.15     RCurl_1.95-4.8               
+## [37] shiny_1.0.1                   acepack_1.4.1                
+## [39] VariantAnnotation_1.21.18     RCurl_1.95-4.8               
 ## [41] magrittr_1.5                  Formula_1.2-1                
-## [43] GO.db_3.4.0                   GenomeInfoDbData_0.99.0      
-## [45] Matrix_1.2-8                  Rcpp_0.12.9                  
-## [47] munsell_0.4.3                 stringi_1.1.2                
+## [43] GO.db_3.4.1                   GenomeInfoDbData_0.99.0      
+## [45] Matrix_1.2-8                  Rcpp_0.12.10                 
+## [47] munsell_0.4.3                 stringi_1.1.3                
 ## [49] yaml_2.1.14                   MASS_7.3-45                  
 ## [51] zlibbioc_1.21.0               plyr_1.8.4                   
-## [53] AnnotationHub_2.7.13          lattice_0.20-34              
+## [53] AnnotationHub_2.7.14          lattice_0.20-35              
 ## [55] splines_3.4.0                 multtest_2.31.0              
-## [57] seqinr_3.3-3                  biomaRt_2.31.4               
-## [59] futile.options_1.0.0          XML_3.98-1.5                 
-## [61] evaluate_0.10                 biovizBase_1.23.2            
+## [57] seqinr_3.3-3                  biomaRt_2.31.5               
+## [59] futile.options_1.0.0          XML_3.98-1.6                 
+## [61] evaluate_0.10                 biovizBase_1.23.3            
 ## [63] latticeExtra_0.6-28           data.table_1.10.4            
 ## [65] lambda.r_1.1.9                idr_1.2                      
 ## [67] httpuv_1.3.3                  gtable_0.2.0                 
-## [69] assertthat_0.1                ggplot2_2.2.1                
-## [71] mime_0.5                      xtable_1.8-2                 
-## [73] survival_2.40-1               tibble_1.2                   
-## [75] GenomicAlignments_1.11.9      memoise_1.0.0                
-## [77] cluster_2.0.5                 Rhtslib_1.7.0                
+## [69] ggplot2_2.2.1                 mime_0.5                     
+## [71] xtable_1.8-2                  AnnotationFilter_0.99.8      
+## [73] survival_2.41-3               tibble_1.3.0                 
+## [75] GenomicAlignments_1.11.12     memoise_1.0.0                
+## [77] cluster_2.0.6                 Rhtslib_1.7.0                
 ## [79] interactiveDisplayBase_1.13.0
 ```
 
