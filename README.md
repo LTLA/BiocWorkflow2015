@@ -1,38 +1,28 @@
 # A Bioconductor workflow for DB analyses of ChIP-seq data
 
-Compilation of the workflow is quite involved, so an explanation is provided here.
-The first step is to convert the figure tags into figure numbers. 
-This is because markdown doesn't have particularly good support for figure labelling - at least, not in a flexible manner that works for both LaTeX and HTML. 
-Instead, we hard-code the figure numbers into the markdown text, so that it makes sense in all downstream applications. 
-Figure numbers are also hardcoded into the captions, which means that you need to specify empty captions within LaTeX.
+First we compile the R markdown file. 
+We save the intermediates so that we can check the results against the expected values.
 
-```
-./refigure.sh
+```r
+# Execute in a R session
+rmarkdown::render("workflow.Rmd", clean=FALSE)
 ```
 
-The second step is to compile the R markdown file. 
+We update the old result file; a simple `git diff` operation will reveal any differences between them.
 
-```
-echo "knitr::knit('workflow.Rmd')" | R --no-save --vanilla
+```sh
+cp workflow.knit.kmd workflow.md
 ```
 
 Currently, alignment is turned off to ensure we get the same results upon re-analysis (as Rsubread changes quite regularly, and I don't won't to have to keep on checking it). 
 However, we still need to check that the code is correct. 
 To do that, we run it with alignment turned back on.
 
-```
+```sh
 cd aligntest
 cat ../markdown/workflow.Rmd | sed "s/remap <- FALSE/remap <- TRUE/" > workflow.Rmd
-echo "knitr::knit('workflow.Rmd')" | R --no-save --vanilla
+echo "rmarkdown::render('workflow.Rmd', clean=FALSE)" | R --no-save --vanilla
 cd -
-```
-
-The next step is to convert the markdown into a format of choice. 
-Here, we convert it to HTML using render(), but it's also possible to convert to TeX via pandoc. 
-The equivalent F1000 article was generated using the latter approach.
-
-```
-R -e "rmarkdown::render('workflow.md')"
 ```
 
 We also need to convert the R markdown into something that BioC can compile.
