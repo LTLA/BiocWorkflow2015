@@ -308,7 +308,7 @@ frag.len
 ```
 
 ```{r ccfplot, fig.cap="Cross-correlation function (CCF) against delay distance for the H3K9ac data set. The delay with the maximum correlation is shown as the red line."}
-plot(1:length(x)-1, x, xlab="Delay (bp)", ylab="CCF", type="l")
+plot(seq_along(x)-1, x, xlab="Delay (bp)", ylab="CCF", type="l")
 abline(v=frag.len, col="red")
 text(x=frag.len, y=min(x), paste(frag.len, "bp"), pos=4, col="red")
 ```
@@ -779,7 +779,7 @@ This corrects for differences in library sizes between tracks.
 ```{r simplebroadplot, fig.width=8, fig.height=6, fig.cap="Coverage tracks for a simple DB event between pro-B and mature B cells, across a broad region in the H3K9ac data set. Read coverage for each library is shown as a per-million value at each base."}
 collected <- list()
 lib.sizes <- filtered.data$totals/1e6
-for (i in 1:length(bam.files)) { 
+for (i in seq_along(bam.files)) { 
     reads <- extractReads(bam.file=bam.files[i], cur.region, param=param)
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,10), 
@@ -798,8 +798,8 @@ Here, the second-ranking complex cluster is selected for visualization
     (the top-ranking complex cluster is adjacent to the region used in the previous example, so another region is chosen for some variety).
 
 ```{r}
-complex <- out.ranges$logFC.up > 0 & out.ranges$logFC.down > 0
-cur.region <- out.ranges[o[complex[o]][2]]
+complex.db <- out.ranges$logFC.up > 0 & out.ranges$logFC.down > 0
+cur.region <- out.ranges[o[complex.db[o]][2]]
 cur.region
 ```
 
@@ -814,8 +814,8 @@ Upon differentiation to mature B cells, loss of marking in one part of the regio
 This represents a complex DB event that would not be detected if reads were counted across the entire region.
 
 ```{r complexplot, fig.width=8, fig.height=6, fig.cap="Coverage tracks for a complex DB event in the H3K9ac data set, shown as per-million values."}
-collected <- list()
-for (i in 1:length(bam.files)) { 
+collected <- vector("list", length(bam.files)) 
+for (i in seq_along(bam.files)) { 
     reads <- extractReads(bam.file=bam.files[i], cur.region, param=param)
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
@@ -851,8 +851,8 @@ This also coincides with the promoter of the *Cd86* gene.
 Again, this makes biological sense as CD86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
 	
 ```{r simplesharpplot, fig.width=8, fig.height=6, fig.cap="Coverage tracks for a sharp and simple DB event in the H3K9ac data set, shown as per-million values."}
-collected <- list()
-for (i in 1:length(bam.files)) { 
+collected <- vector("list", length(bam.files))
+for (i in seq_along(bam.files)) { 
     reads <- extractReads(bam.file=bam.files[i], cur.region, param=param)
     cov <- as(coverage(reads)/lib.sizes[i], "GRanges")
     collected[[i]] <- DataTrack(cov, type="histogram", lwd=0, ylim=c(0,3), 
@@ -1176,9 +1176,9 @@ In Figure \@ref(fig:tfplot), two adjacent sites are present at the *Gbe1* promot
 Coverage is also substantially different between the WT replicates, consistent with the presence of a batch effect.
 
 ```{r tfplot, fig.height=6, fig.width=8, fig.cap="Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility)."}
-collected <- list()
+collected <- vector("list", length(bam.files))
 lib.sizes <- filtered.data$totals/1e6
-for (i in 1:length(bam.files)) { 
+for (i in seq_along(bam.files)) { 
     reads <- extractReads(bam.file=bam.files[i], cur.region, param=param)
     pcov <- as(coverage(reads[strand(reads)=="+"])/lib.sizes[i], "GRanges")
     ncov <- as(coverage(reads[strand(reads)=="-"])/-lib.sizes[i], "GRanges")
