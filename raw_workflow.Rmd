@@ -2,16 +2,21 @@
 title: "From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data"
 author: 
   - name: Aaron T. L. Lun
-    affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+    affiliation: 
+    - &WEHI The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia
+    - Department of Medical Biology, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+    email: alun@wehi.edu.au
   - name: Gordon K. Smyth
-    affiliation: The Walter and Eliza Hall Institute of Medical Research, 1G Royal Parade, Parkville, VIC 3052, Melbourne, Australia; Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
-date: 23 February 2017
+    affiliation: 
+    - *WEHI
+    - Department of Mathematics and Statistics, The University of Melbourne, Parkville, VIC 3010, Melbourne, Australia
+date: 17 July 2017
+output: 
+  BiocStyle::html_document2
 vignette: >
   %\VignetteIndexEntry{From reads to regions: a Bioconductor workflow to detect differential binding in ChIP-seq data}
   %\VignetteEngine{knitr::rmarkdown}
-output: 
-    BiocStyle::html_document:
-        fig_caption: yes
+  %\VignetteEncoding{UTF-8}    
 bibliography: ref.bib
 ---
 
@@ -294,7 +299,7 @@ Strand bimodality is often observed in ChIP-seq experiments involving narrow bin
 This refers to the presence of distinct subpeaks on each strand and is quantified with cross-correlation plots [@kharchenko2008design].
 A strong peak in the cross-correlations should be observed if immunoprecipitation was successful.
 The delay distance at the peak corresponds to the distance between forward-/reverse-strand subpeaks.
-This is identified from Figure ((ccfplot)) and is used as the average fragment length for this analysis.
+This is identified from Figure \@ref(fig:ccfplot) and is used as the average fragment length for this analysis.
 
 ```{r}
 x <- correlateReads(bam.files, param=reform(param, dedup=TRUE))
@@ -361,7 +366,7 @@ keep <- filter.stat$filter > log2(min.fc)
 summary(keep)
 ```
 
-The effect of the fold-change threshold is examined visually in Figure ((bghistplot)).
+The effect of the fold-change threshold is examined visually in Figure \@ref(fig:bghistplot).
 The chosen threshold is greater than the abundances of most bins in the genome -- presumably, those that contain background regions.
 This suggests that the filter will remove most windows lying within background regions.
 
@@ -381,7 +386,7 @@ filtered.data <- win.data[keep,]
 ## Normalizing for library-specific trended biases
 
 Normalization is required to eliminate confounding library-specific biases prior to any comparisons between libraries.
-Here, a trended bias is present between libraries in Figure ((trendplot)).
+Here, a trended bias is present between libraries in Figure \@ref(fig:trendplot).
 This refers to a systematic fold-difference in window coverage between libraries that changes according to the average abundance of the window.
 
 ```{r trendplot, fig.cap="Abundance-dependent trend in the log-fold change between two H3K9ac libraries (mature B over pro-B), across all windows retained after filtering."}
@@ -404,7 +409,7 @@ head(offsets)
 ```
 
 The effect of non-linear normalization is visualized with another mean-difference plot.
-Once the offsets are applied to adjust the log-fold changes, the trend is eliminated from the plot (Figure ((normplot))).
+Once the offsets are applied to adjust the log-fold changes, the trend is eliminated from the plot (Figure \@ref(fig:normplot)).
 The cloud of points is also centred at a log-fold change of zero.
 This indicates that normalization was successful in removing the differences between libraries. 
 
@@ -467,7 +472,7 @@ y <- estimateDisp(y, design)
 summary(y$trended.dispersion)
 ```
 
-The NB dispersion trend is visualized in Figure ((bcvplot)) as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
+The NB dispersion trend is visualized in Figure \@ref(fig:bcvplot) as the biological coefficient of variation (BCV), i.e., the square root of the NB dispersion.
 Note that only the trended dispersion will be used in the downstream steps -- the common and tagwise values are only shown for diagnostic purposes.
 Specifically, the common BCV provides an overall measure of the variability in the data set, averaged across all windows.
 Data sets with common BCVs ranging from 10 to 20% are considered to have low variability, i.e., counts are highly reproducible.
@@ -479,7 +484,7 @@ plotBCV(y)
 
 For most data sets, one would expect to see a trend that decreases to a plateau with increasing average abundance. 
 This reflects the greater reliability of large counts, where the effects of stochasticity and technical artifacts (e.g., mapping errors, PCR duplicates) are averaged out.
-In Figure ((bcvplot)), the range of abundances after filtering is such that the plateau has already been reached.
+In Figure \@ref(fig:bcvplot), the range of abundances after filtering is such that the plateau has already been reached.
 This is still a satisfactory result, as it indicates that the retained windows have low variability and more power to detect DB.
 
 ### Estimating the QL dispersion
@@ -489,7 +494,7 @@ This introduces a QL dispersion parameter for each window, which captures variab
 Thus, the QL dispersion can model window-specific variability, whereas the NB dispersion trend is averaged across many windows.
 However, with limited replicates, there is not enough information for each window to stably estimate the QL dispersion.
 This is overcome by sharing information between windows with empirical Bayes (EB) shrinkage.
-The instability of the QL dispersion estimates is reduced by squeezing the estimates towards an abundance-dependent trend (Figure ((qlplot))).
+The instability of the QL dispersion estimates is reduced by squeezing the estimates towards an abundance-dependent trend (Figure \@ref(fig:qlplot)).
 
 ```{r qlplot, fig.cap="Effect of EB shrinkage on the raw QL dispersion estimate for each window (black) towards the abundance-dependent trend (blue) to obtain squeezed estimates (red)."}
 fit <- glmQLFit(y, design, robust=TRUE)
@@ -511,7 +516,7 @@ summary(fit$df.prior)
 Multi-dimensional scaling (MDS) plots are used to examine the similarities between libraries.
 The distance between a pair of libraries on this plot represents the overall log-fold change between those libraries.
 Ideally, replicates should cluster together while samples from different conditions should be separate.
-In Figure ((mdsplot)), strong separation in the first dimension is observed between libraries from different cell types.
+In Figure \@ref(fig:mdsplot), strong separation in the first dimension is observed between libraries from different cell types.
 This indicates that significant differences are likely to be present between cell types in this data set.
 
 ```{r mdsplot, fig.cap="MDS plot with two dimensions for all libraries in the H3K9ac data set. Libraries are labelled and coloured according to the cell type."}
@@ -749,7 +754,7 @@ symbol(greg) <- symbols[gene(greg)]
 ### Simple DB across a broad region
 
 To begin with, the top-ranking DB region will be visualized. 
-This represents a simple DB event where the entire region changes in one direction (Figure ((simplebroadplot))).
+This represents a simple DB event where the entire region changes in one direction (Figure \@ref(fig:simplebroadplot)).
 Specifically, it represents an increase in H3K9ac marking at the *H2-Aa* locus.
 This is consistent with the expected biology -- 
     H3K9ac is a mark of active gene expression [@karmodiya2012h3k9] 
@@ -804,7 +809,7 @@ if (!overlapsAny(cur.region, GRanges("chr5", IRanges(122987201, 122991450)), typ
 }
 ```
 
-This region contains a bidirectional promoter where different genes are marked in the different cell types (Figure ((complexplot))).
+This region contains a bidirectional promoter where different genes are marked in the different cell types (Figure \@ref(fig:complexplot)).
 Upon differentiation to mature B cells, loss of marking in one part of the region is balanced by a gain in marking in another part of the region.
 This represents a complex DB event that would not be detected if reads were counted across the entire region.
 
@@ -841,7 +846,7 @@ if (!overlapsAny(cur.region, GRanges("chr16", IRanges(36665551, 36666200)), type
 }
 ```
 
-Marking is increased for mature B cells within a 500 bp region (Figure ((simplesharpplot))), which is sharper than the changes in the previous two examples.
+Marking is increased for mature B cells within a 500 bp region (Figure \@ref(fig:simplesharpplot)), which is sharper than the changes in the previous two examples.
 This also coincides with the promoter of the *Cd86* gene.
 Again, this makes biological sense as CD86 is involved in regulating immunoglobulin production in activated B-cells [@podojil2003selective].
 	
@@ -1022,7 +1027,7 @@ normfacs <- normOffsets(bins)
 normfacs
 ```
 
-The effect of normalization is visualized with some mean-difference plots between pairs of libraries (Figure ((compoplot))).
+The effect of normalization is visualized with some mean-difference plots between pairs of libraries (Figure \@ref(fig:compoplot)).
 The dense cloud in each plot represents the majority of bins in the genome.
 These are assumed to mostly contain background regions.
 A non-zero log-fold change for these bins indicates that composition bias is present between libraries.
@@ -1095,7 +1100,7 @@ summary(fit$df.prior)
 
 These statistics are consistent with the presence of a batch effect between replicates.
 The dispersions for all windows are inflated to a similarly large value by the batch effect, resulting in low variability in the dispersions across windows.
-This is illustrated in Figure ((mdsplot2)) where the WT libraries are clearly separated in both dimensions of the MDS plot.
+This is illustrated in Figure \@ref(fig:mdsplot2) where the WT libraries are clearly separated in both dimensions of the MDS plot.
 In particular, separation of replicates on the first dimension is indicative of a systematic difference of size comparable to that between genotypes.
 
 ```{r mdsplot2, fig.cap="MDS plot with two dimensions for all libraries in the CBP data set. Libraries are labelled and coloured according to the genotype. A larger top set of windows was used to improve the visualization of the genome-wide differences between the WT libraries."}
@@ -1167,7 +1172,7 @@ if (!overlapsAny(cur.region, GRanges("chr16", IRanges(70313851, 70314860)), type
 
 Plotting is performed using two tracks for each library -- one for the forward-strand coverage, another for the reverse-strand coverage.
 This allows visualization of the strand bimodality that is characteristic of genuine TF binding sites.
-In Figure ((tfplot)), two adjacent sites are present at the *Gbe1* promoter, both of which exhibit increased binding in the WT genotype.
+In Figure \@ref(fig:tfplot), two adjacent sites are present at the *Gbe1* promoter, both of which exhibit increased binding in the WT genotype.
 Coverage is also substantially different between the WT replicates, consistent with the presence of a batch effect.
 
 ```{r tfplot, fig.height=6, fig.width=8, fig.cap="Coverage tracks for TF binding sites that are differentially bound in the WT (top two tracks) against the KO (last two tracks). Blue and red tracks represent forward- and reverse-strand coverage, respectively, on a per-million scale (capped at 5 in SRR1145788, for visibility)."}
